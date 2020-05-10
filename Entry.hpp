@@ -22,6 +22,12 @@ enum class EntryType {
 	SERIES_EPISODE
 };
 
+enum class Genre {
+	DRAMA,
+	ACTION,
+	MYSTERY
+};
+
 
 class Entry {
 protected:
@@ -30,8 +36,9 @@ protected:
 
 	std::string m_name;
 	EntryType m_type;
+	Genre m_genre;
 
-	Entry(const std::string& t_name, EntryType t_type);
+	Entry(const std::string& t_name, EntryType t_type, Genre t_genre);
 	
 
 	virtual void rate(int t_rating) const = 0;
@@ -43,12 +50,14 @@ protected:
 public: 
 	const std::string& getName() const;
 	EntryType getType() const;
+	Genre getGenre() const;
 };
 const int Entry::s_minRating{0};
 const int Entry::s_maxRating{5};
-Entry::Entry(const std::string& t_name, EntryType t_type) : m_name{ t_name }, m_type{ t_type }{}
+Entry::Entry(const std::string& t_name, EntryType t_type, Genre t_genre) : m_name{ t_name }, m_type{ t_type }, m_genre{t_genre}{}
 const std::string& Entry::getName() const { return m_name; }
 EntryType Entry::getType() const { return m_type; }
+Genre Entry::getGenre() const { return m_genre; }
 int Entry::clipRating(int t_rating) const {
 	if (t_rating > s_maxRating) { return s_maxRating; }
 	if (t_rating < s_minRating) { return s_minRating; }
