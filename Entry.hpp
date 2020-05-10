@@ -21,7 +21,6 @@ enum class EntryType {
 };
 
 
-
 class Entry {
 protected:
 	static const int s_minRating;
@@ -30,13 +29,14 @@ protected:
 	std::string m_name;
 	EntryType m_type;
 
-	Entry(const std::string& t_name, int t_rating);
+	Entry(const std::string& t_name, EntryType t_type);
 	
 
 	virtual void rate(int t_rating) const = 0;
 	virtual int getRating() const = 0;
 	virtual unsigned getLength() const = 0;
-
+	
+	int clipRating(int t_rating) const;
 
 public: 
 	const std::string& getName() const;
@@ -44,8 +44,15 @@ public:
 };
 const int Entry::s_minRating{0};
 const int Entry::s_maxRating{5};
+Entry::Entry(const std::string& t_name, EntryType t_type) : m_name{ t_name }, m_type{ t_type }{}
 const std::string& Entry::getName() const { return m_name; }
 EntryType Entry::getType() const { return m_type; }
+int Entry::clipRating(int t_rating) const {
+	if (t_rating > s_maxRating) { return s_maxRating; }
+	if (t_rating < s_minRating) { return s_minRating; }
+	return t_rating;
+}
+
 
 // Class for single elements such a move or video, in opposition to series which are collections
 class AtomicEntry : public Entry{
