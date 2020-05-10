@@ -7,11 +7,13 @@
 
 class Entry;
 class SeriesEpisode;
+class AtomicEntry;
+class CollectionEntry;
 
 using Ratings = std::vector<int>;
 using EntryPtr = std::unique_ptr<Entry>;
-using EpisodePtr = std::unique_ptr<SeriesEpisode>;
-using Episodes = std::vector<EpisodePtr>;
+using SubEntryPtr = std::unique_ptr<AtomicEntry>;
+using SubEntries = std::vector<SubEntryPtr>;
 
 enum class EntryType {
 	VIDEO,
@@ -70,10 +72,31 @@ unsigned AtomicEntry::getLength() const { return m_length; }
 
 class CollectionEntry : public Entry {
 	
-	int getRating() const = 0;
-	unsigned getLength() const = 0;
+	SubEntries m_subEntries;
+
+public:
+	int getRating() const;
+	unsigned getLength() const;
 };
 
+// Returns average of all ratings of all episodes
+int CollectionEntry::getRating() const {
+	int accRating{ 0 };
+	int numEntries{ 0 };
+	for (const auto& subEntry : m_subEntries) {
+		accRating += subEntry->getRating;
+		numEntries++; // TODO: Decide what formula will be used to calculate raing of CollectionEntry.
+	}
+	return ;
+}
+
+unsigned CollectionEntry::getLength()const {
+	unsigned accLength{ 0U };
+	for (const auto& subEntry : m_subEntries) {
+		accLength += subEntry->getLength();
+	}
+	return accLength;
+}
 
 
 
