@@ -32,10 +32,24 @@ public:
 
 	const Series* getSeriesByName(const std::string& t_name) const; // Returns nullptr if video is not found
 	Series* getSeriesByName(const std::string& t_name); // Returns nullptr if video is not found
-
+	
 	std::vector<Movie*>& getMovies(std::vector<Movie*>& t_outMovies);
+
+	// Returns all the video entries that match the filter function
+	template <typename Functor>
+	std::vector<Video*>& filter(Functor t_filter , std::vector<Video*>& t_outVideos);
 
 
 };
+
+template<typename Functor>
+inline std::vector<Video*>& VideoDataHolder::filter(Functor t_filter, std::vector<Video*>& t_outVideos){
+	for (const auto& vidPtr : m_videos) {
+		if (t_filter(&vidPtr)) {
+			t_outVideos.push_back(vidPtr);
+		}
+	}
+	return t_outVideos;
+}
 
 #endif // !VIDEO_DATA_HOLDER_HPP
