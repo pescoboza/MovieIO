@@ -2,6 +2,9 @@
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
+#include "json.hpp" // Credits to https://github.com/nlohmann/json
+
+namespace js = nlohmann;
 
 VideoDataHolder::VideoDataHolder() : m_videosById{}, m_movies{}, m_series{}{}
 
@@ -15,10 +18,12 @@ void VideoDataHolder::parseInfoFromFile(const std::string& t_filename){
 		throw std::runtime_error{errMsg.str()};
 	}
 
-	std::stringstream buffer;
-	buffer << file.rdbuf();
+	js::json jf{ js::json::parse(file) };
 	file.close();
 
+	for (auto a : jf) {
+
+	}
 	// TODO: Create file parser
 }
 
