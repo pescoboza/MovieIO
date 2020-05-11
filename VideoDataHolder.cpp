@@ -46,18 +46,18 @@ std::vector<Movie*>& VideoDataHolder::getMovies(std::vector<Movie*>& t_outMovies
 	return t_outMovies;
 }
 
-std::vector<Video*>& VideoDataHolder::getVideosOfGenre(Genre t_genre, std::vector<Video*>& t_outVideos){
+std::vector<Video*>& VideoDataHolder::getVideosOfGenre(Genre t_genre, std::vector<Video*>& t_inVideos,std::vector<Video*>& t_outVideos){
 	return filter([&t_genre](const Video& t_video) {
 		return t_genre == t_video.getGenre();
-	}, t_outVideos);
+	}, t_inVideos,t_outVideos);
 }
 
-std::vector<Video*>& VideoDataHolder::getVideosOfRating(float t_min, float t_max, std::vector<Video*>& t_outVideos){
+std::vector<Video*>& VideoDataHolder::getVideosOfRating(float t_min, float t_max, std::vector<Video*>& t_inVideos, std::vector<Video*>& t_outVideos){
 	if (t_min > t_max) { std::swap(t_min, t_max); }
 	if (t_min < Video::s_minRating) { t_min = Video::s_minRating; }
 	if (t_max > Video::s_maxRating) { t_max = Video::s_maxRating; }
 	return filter([&t_min, &t_max](const Video& t_video) {
 		float rating{t_video.getRating()};
 		return t_min <= rating && t_max >= rating;
-		}, t_outVideos);
+		}, t_inVideos, t_outVideos);
 }

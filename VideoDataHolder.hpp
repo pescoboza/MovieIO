@@ -37,18 +37,18 @@ public:
 
 	// Returns all the video entries that match the filter function
 	template <typename Functor>
-	std::vector<Video*>& filter(Functor t_filter , std::vector<Video*>& t_outVideos);
+	static std::vector<Video*>& filter(Functor t_filter, std::vector<Video*> t_inVideos, std::vector<Video*>& t_outVideos);
 
-	std::vector<Video*>& getVideosOfGenre(Genre t_genre, std::vector<Video*>& t_outVideos);
-	std::vector<Video*>& getVideosOfRating(float t_min, float t_max, std::vector<Video*>& t_outVideos);
+	static std::vector<Video*>& getVideosOfGenre(Genre t_genre, std::vector<Video*>& t_inVideos, std::vector<Video*>& t_outVideos);
+	static std::vector<Video*>& getVideosOfRating(float t_min, float t_max, std::vector<Video*>& t_inVideos, std::vector<Video*>& t_outVideos);
 	
 };
 
 template<typename Functor>
-inline std::vector<Video*>& VideoDataHolder::filter(Functor t_filter, std::vector<Video*>& t_outVideos){
-	for (const auto& vidPair : m_videos) {
-		if (t_filter(*vidPair.second)) {
-			t_outVideos.push_back(vidPair.second);
+inline std::vector<Video*>& VideoDataHolder::filter(Functor t_filter, std::vector<Video*> t_inVideos, std::vector<Video*>& t_outVideos){
+	for (auto vidPtr : t_inVideos) {
+		if (t_filter(*vidPtr)) {
+			t_outVideos.push_back(vidPtr);
 		}
 	}
 	return t_outVideos;
