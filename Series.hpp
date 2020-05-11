@@ -22,6 +22,7 @@ class Series {
 	Seasons m_seasons;
 public:
 	Series(const std::string& t_name);
+	const std::string& getName() const;
 	Series& addSeason();
 	Series& addSeason(unsigned t_number);
 	std::vector<Season*>& getAllSeasons(std::vector<Season*>& t_outSeasons) const;

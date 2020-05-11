@@ -3,6 +3,8 @@
 
 Series::Series(const std::string& t_name) : m_name{t_name} {}
 
+const std::string& Series::getName() const { return m_name; }
+
 Series& Series::addSeason() { 
 	unsigned max{ 1U };
 	for (const auto& p : m_seasons) {

@@ -13,13 +13,13 @@ using Videos = std::unordered_map<std::string, Video*>; // non data-owning ptr
 using MoviePtr = std::unique_ptr<Movie>;
 using MoviesVec = std::vector<MoviePtr>;
 using SeriesPtr = std::unique_ptr<Series>;
-using SeriesVec = std::vector<SeriesPtr>;
+using SeriesMap = std::unordered_map<std::string,SeriesPtr>;
 
 class VideoDataHolder {
 	
 	Videos m_videos;
 	MoviesVec m_movies;
-	SeriesVec m_series;
+	SeriesMap m_series;
 
 public:
 	VideoDataHolder();
@@ -27,8 +27,14 @@ public:
 	VideoDataHolder& addSeries(SeriesPtr t_series);
 	VideoDataHolder& addMovie(MoviePtr t_movie);
 
-	const Video& getVideo(const std::string& t_videoId) const;
-	Video& getVideo(const std::string& t_videoId);
+	const Video* getVideoById(const std::string& t_videoId) const; // Returns nullptr if video is not found
+	Video* getVideoById(const std::string& t_videoId); // Returns nullptr if video is not found
+
+	const Series* getSeriesByName(const std::string& t_name) const; // Returns nullptr if video is not found
+	Series* getSeriesByName(const std::string& t_name); // Returns nullptr if video is not found
+
+	std::vector<Movie*>& getMovies(std::vector<Movie*>& t_outMovies);
+
 
 };
 
