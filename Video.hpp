@@ -18,9 +18,11 @@ enum class VideoType {
 };
 
 class Video {
-protected:
+public:	
 	static const float s_minRating;
 	static const float s_maxRating;
+
+protected:
 
 	std::string m_name;
 	std::string m_id;
@@ -38,10 +40,8 @@ public:
 	const std::string& getId()const;
 	VideoType getType() const;
 	unsigned getDuration() const;
-
+	Genre getGenre() const;
 	void rate(float t_rating);
-	
-
 };
 
 #endif // !VIDEO_HPP
