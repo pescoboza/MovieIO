@@ -26,6 +26,15 @@ Series& Series::addSeason(unsigned t_number){
 	return *this;
 }
 
+Season::Season(Series& t_series) : m_series{ t_series } {}
+
 Series& Season::getSeries() { return m_series; }
 
 const Series& Season::getSeries() const { return m_series; }
+
+Episode::Episode(const std::string& m_name, const std::string& t_id, unsigned t_duration, Genre t_genre, Season& t_season) :
+	Video{ m_name, t_id, t_duration, t_genre, VideoType::SERIES_EPISODE}, m_season{t_season}{}
+
+Season& Episode::getSeason() { return m_season; }
+
+const Season& Episode::getSeason() const { return m_season; }
