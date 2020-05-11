@@ -29,6 +29,7 @@
     <ClCompile Include="Movie.cpp" />
     <ClCompile Include="Series.cpp" />
     <ClCompile Include="Video.cpp" />
+    <ClCompile Include="VideoDataHolder.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

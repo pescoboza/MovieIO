@@ -26,6 +26,21 @@ Series& Series::addSeason(unsigned t_number){
 	return *this;
 }
 
+std::vector<Season*>& Series::getAllSeasons(std::vector<Season*>& t_outSeasons) const{
+	t_outSeasons.reserve(t_outSeasons.size() + m_seasons.size());
+	for (const auto& ssnPair : m_seasons) {
+		t_outSeasons.push_back(ssnPair.second.get());
+	}
+	return t_outSeasons;
+}
+
+std::vector<Episode*>& Series::getAllEpisodes(std::vector<Episode*>& t_outEpisodes) const{
+	for (const auto& ssnPair : m_seasons) {
+		ssnPair.second->getAllEpisodes(t_outEpisodes);
+	}
+	return t_outEpisodes;
+}
+
 Season::Season(Series& t_series) : m_series{ t_series } {}
 
 SeasonPtr Season::newSeason(Series& t_series){	
@@ -40,6 +55,14 @@ const Series& Season::getSeries() const { return m_series; }
 Season& Season::addEpisode(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre){
 	m_episodes.emplace_back(Episode::newEpisode(t_name, t_id, t_duration, t_genre, *this));
 	return *this;
+}
+
+std::vector<Episode*>& Season::getAllEpisodes(std::vector<Episode*>& t_outEpisodes) const {
+	t_outEpisodes.reserve(t_outEpisodes.size() + m_episodes.size());
+	for (const auto& epPtr : m_episodes) {
+		t_outEpisodes.push_back(epPtr.get());
+	}
+	return t_outEpisodes;
 }
 
 Episode::Episode(const std::string& m_name, const std::string& t_id, unsigned t_duration, Genre t_genre, Season& t_season) :
