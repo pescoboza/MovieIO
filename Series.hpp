@@ -27,22 +27,28 @@ public:
 };
 
 class Season {
+	friend class Series;
+
 	Series& m_series;
 	Episodes m_episodes;
 
-public:
 	Season(Series& t_series);
+	static SeasonPtr newSeason(Series& t_series);
+
+public:
 	Series& getSeries();
 	const Series& getSeries() const;
+	Season& addEpisode(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre);
 };
 
 
 class Episode : public Video {
-	
+	friend class Season;
 	Season& m_season;
 
+	Episode(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre, Season& t_season);
+	static EpisodePtr newEpisode(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre, Season& t_season);
 public:
-	Episode(const std::string& m_name, const std::string& t_id, unsigned t_duration, Genre t_genre, Season& t_season);
 	Season& getSeason();
 	const Season& getSeason() const;
 };

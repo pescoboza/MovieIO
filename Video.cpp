@@ -1,5 +1,8 @@
 #include "Video.hpp"
 
+Video::Video(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre, VideoType t_type):
+	m_name{ t_name }, m_id{ t_id }, m_duration{ t_duration }, m_genre{ t_genre }, m_type{t_type}{}
+
 const std::string& Video::getName() const { return m_name; }
 
 float Video::getRating() const {
@@ -11,6 +14,8 @@ float Video::getRating() const {
 	}
 	return accRating / size;
 }
+
+const std::string& Video::getId() const { return m_id; }
 
 VideoType Video::getType() const{ return m_type;}
 

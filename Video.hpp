@@ -30,7 +30,7 @@ protected:
 	Ratings m_ratings;
 
 
-	Video(const std::string& m_name,  const std::string& t_id, unsigned t_duration, Genre t_genre, VideoType m_type);
+	Video(const std::string& t_name,  const std::string& t_id, unsigned t_duration, Genre t_genre, VideoType t_type);
 
 public:
 	const std::string& getName() const;
