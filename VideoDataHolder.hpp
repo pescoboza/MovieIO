@@ -17,12 +17,16 @@ using SeriesMap = std::unordered_map<std::string,SeriesPtr>;
 
 class VideoDataHolder {
 	
-	Videos m_videos;
+	Videos m_videosById;
+	Videos m_videosByName;
+
 	MoviesVec m_movies;
 	SeriesMap m_series;
 
 public:
 	VideoDataHolder();
+
+	void parseInfoFromFile(const std::string& t_filename);
 	
 	VideoDataHolder& addSeries(SeriesPtr t_series);
 	VideoDataHolder& addMovie(MoviePtr t_movie);
@@ -42,6 +46,9 @@ public:
 	static std::vector<Video*>& getVideosOfGenre(Genre t_genre, std::vector<Video*>& t_inVideos, std::vector<Video*>& t_outVideos);
 	static std::vector<Video*>& getVideosOfRating(float t_min, float t_max, std::vector<Video*>& t_inVideos, std::vector<Video*>& t_outVideos);
 	
+private:
+	VideoDataHolder& addVideo(Video* t_video);
+	VideoDataHolder& addVideos(const std::vector<Video*>& t_videos);
 };
 
 template<typename Functor>

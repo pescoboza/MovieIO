@@ -43,6 +43,13 @@ std::vector<Episode*>& Series::getAllEpisodes(std::vector<Episode*>& t_outEpisod
 	return t_outEpisodes;
 }
 
+std::vector<Video*>& Series::getAllEpisodes(std::vector<Video*>& t_outEpisodes) const {
+	for (const auto& ssnPair : m_seasons) {
+		ssnPair.second->getAllEpisodes(t_outEpisodes);
+	}
+	return t_outEpisodes;
+}
+
 Season::Season(Series& t_series) : m_series{ t_series } {}
 
 SeasonPtr Season::newSeason(Series& t_series){	

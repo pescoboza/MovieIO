@@ -1,31 +1,56 @@
 #include "VideoDataHolder.hpp"
+#include <fstream>
+#include <sstream>
+#include <stdexcept>
 
-VideoDataHolder::VideoDataHolder() : m_videos{}, m_movies{}, m_series{}{}
+VideoDataHolder::VideoDataHolder() : m_videosById{}, m_movies{}, m_series{}{}
+
+void VideoDataHolder::parseInfoFromFile(const std::string& t_filename){
+	std::ifstream file;
+	file.open(t_filename);
+	if (!file.is_open()) {
+		file.close();
+		std::ostringstream errMsg;
+		errMsg << "Could not open file \"" << t_filename << "\".\n";
+		throw std::runtime_error{errMsg.str()};
+	}
+
+	std::stringstream buffer;
+	buffer << file.rdbuf();
+	file.close();
+
+	// TODO: Create file parser
+}
 
 VideoDataHolder& VideoDataHolder::addSeries(SeriesPtr t_series){
-	auto it{m_series.find(t_series->getName())};
-	if (it != m_series.end()) {
-		m_series.erase(it);
+	{
+		auto it{ m_series.find(t_series->getName()) };
+		if (it != m_series.end()) {
+			m_series.erase(it);
+		}
 	}
-	m_series.emplace(t_series->getName(), std::move(t_series));
+	auto empl_it{ m_series.emplace(t_series->getName(), std::move(t_series)) };
+	std::vector<Video*> episodes;
+	empl_it.first->second->getAllEpisodes(episodes);
+	addVideos(episodes);
 	return *this;
 }
 
 VideoDataHolder& VideoDataHolder::addMovie(MoviePtr t_movie){
 	m_movies.emplace_back(std::move(t_movie));
-	auto mov{ m_movies.back().get() };
-	m_videos.emplace(mov->getId(), mov);
+	Video* movie{ m_movies.back().get() };
+	addVideo(movie);
 	return *this;
 }
 
 const Video* VideoDataHolder::getVideoById(const std::string& t_videoId) const{
-	auto it{ m_videos.find(t_videoId) };
-	return it != m_videos.cend() ? it->second : nullptr;
+	auto it{ m_videosById.find(t_videoId) };
+	return it != m_videosById.cend() ? it->second : nullptr;
 }
 
 Video* VideoDataHolder::getVideoById(const std::string& t_videoId){
-	auto it{m_videos.find(t_videoId)};
-	return it != m_videos.end() ? it->second : nullptr;
+	auto it{m_videosById.find(t_videoId)};
+	return it != m_videosById.end() ? it->second : nullptr;
 }
 
 const Series* VideoDataHolder::getSeriesByName(const std::string& t_name) const{
@@ -60,4 +85,15 @@ std::vector<Video*>& VideoDataHolder::getVideosOfRating(float t_min, float t_max
 		float rating{t_video.getRating()};
 		return t_min <= rating && t_max >= rating;
 		}, t_inVideos, t_outVideos);
+}
+
+VideoDataHolder& VideoDataHolder::addVideo(Video* t_video){
+	m_videosById.emplace(t_video->getId(), t_video);
+	m_videosByName.emplace(t_video->getName(), t_video);
+	return *this;
+}
+
+VideoDataHolder& VideoDataHolder::addVideos(const std::vector<Video*>& t_videos){
+	for (auto ptr : t_videos) {	addVideo(ptr);}
+	return *this;
 }
