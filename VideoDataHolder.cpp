@@ -23,16 +23,18 @@ void VideoDataHolder::parseInfoFromFile(const std::string& t_filename){
 
 	for (auto& entry : jf) {
 
-		const auto& name{ entry["name"].get<std::string>() };
-		const auto& genre{ entry["genre"].get<std::string>() };
-		const auto& duration{ entry["duration"].get<int>() };
-		const auto& ratings{ entry["ratings"].get<std::vector<float>>() };
+		const auto name{ entry["name"].get<std::string>() };
+		const auto genre{ entry["genre"].get<std::string>() };
+		const auto duration{ entry["duration"].get<unsigned>() };
+		const auto ratings{ entry["ratings"].get<std::vector<float>>() };
+		const auto id{ entry["id"].get<std::string>() };
+		Genre genre{};
+		Video::getVideoTypeFromStr(entry["genre"].get<std::string>(), )
+		
 		// TODO: Finish parsing
 
 		if (entry["type"] == "movie") {
-			addMovie(Movie::newMovie(
-				
-			));
+			addMovie(Movie::newMovie(name,id, duration,|));
 		}
 
 	}

@@ -5,9 +5,11 @@
 #include <unordered_map>
 #include <vector>
 
+enum class Genre;
 enum class VideoType;
 
 using Ratings = std::vector<float>;
+using GenreMap = std::unordered_map<std::string, Genre>;
 using VideoTypesMap = std::unordered_map<std::string, VideoType>;
 
 enum class Genre {
@@ -26,8 +28,12 @@ public:
 	static const float s_minRating;
 	static const float s_maxRating;
 
-protected:
+private:
+	static const GenreMap s_genresStrings;
 	static const VideoTypesMap s_videoTypesStrings;
+
+protected:
+	
 
 	std::string m_name;
 	std::string m_id;
@@ -43,11 +49,13 @@ public:
 	const std::string& getName() const;
 	float getRating() const;
 	const std::string& getId()const;
+	Genre getGenre() const;
 	VideoType getType() const;
 	unsigned getDuration() const;
-	Genre getGenre() const;
 	void rate(float t_rating);
-	
+
+	static const std::string& getGenreStrFromType(Genre t_genre);
+	static bool getGenreTypeFromStr(const std::string& t_str, Genre& t_outGenre);
 	static bool getVideoTypeFromStr(const std::string& t_str, VideoType& t_outType);
 	static const std::string& getVideoStrFromType(VideoType t_type);
 };
