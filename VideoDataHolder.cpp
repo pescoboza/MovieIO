@@ -21,7 +21,19 @@ void VideoDataHolder::parseInfoFromFile(const std::string& t_filename){
 	js::json jf{ js::json::parse(file) };
 	file.close();
 
-	for (auto a : jf) {
+	for (auto& entry : jf) {
+
+		const auto& name{ entry["name"].get<std::string>() };
+		const auto& genre{ entry["genre"].get<std::string>() };
+		const auto& duration{ entry["duration"].get<int>() };
+		const auto& ratings{ entry["ratings"].get<std::vector<float>>() };
+		// TODO: Finish parsing
+
+		if (entry["type"] == "movie") {
+			addMovie(Movie::newMovie(
+				
+			));
+		}
 
 	}
 	// TODO: Create file parser

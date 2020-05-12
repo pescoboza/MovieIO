@@ -27,3 +27,20 @@ unsigned Video::getDuration() const {return m_duration;}
 Genre Video::getGenre() const { return m_genre; }
 
 void Video::rate(float t_rating) { m_ratings.emplace_back(t_rating); }
+
+bool Video::getVideoTypeFromStr(const std::string& t_str, VideoType& t_outType){
+	auto it{s_videoTypesStrings.find(t_str)};
+	if (it != s_videoTypesStrings.cend()) {
+		t_outType = it->second;
+		return true;
+	}
+	return false;
+}
+
+const std::string& Video::getVideoStrFromType(VideoType t_type){
+	for (const auto & p : s_videoTypesStrings) {
+		if (t_type == p.second) { return p.first; }
+	}
+	return "";
+}
+

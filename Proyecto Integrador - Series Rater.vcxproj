@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="json.hpp" />
     <ClInclude Include="Movie.hpp" />
     <ClInclude Include="Series.hpp" />
     <ClInclude Include="Video.hpp" />
