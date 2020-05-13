@@ -10,7 +10,7 @@ enum class VideoType;
 
 using Ratings = std::vector<float>;
 using GenreMap = std::unordered_map<std::string, Genre>;
-using VideoTypesMap = std::unordered_map<std::string, VideoType>;
+using VideoTypeMap = std::unordered_map<std::string, VideoType>;
 
 enum class Genre {
 	DRAMA,
@@ -30,7 +30,7 @@ public:
 
 private:
 	static const GenreMap s_genresStrings;
-	static const VideoTypesMap s_videoTypesStrings;
+	static const VideoTypeMap s_videoTypesStrings;
 
 protected:
 	
@@ -54,10 +54,10 @@ public:
 	unsigned getDuration() const;
 	void rate(float t_rating);
 
-	static const std::string& getGenreStrFromType(Genre t_genre);
-	static bool getGenreTypeFromStr(const std::string& t_str, Genre& t_outGenre);
+	static const std::string& getStrFromGenre(Genre t_genre);
+	static bool getGenreFromStr(const std::string& t_str, Genre& t_outGenre);
 	static bool getVideoTypeFromStr(const std::string& t_str, VideoType& t_outType);
-	static const std::string& getVideoStrFromType(VideoType t_type);
+	static const std::string& getStrFromVideoType(VideoType t_type);
 };
 
 #endif // !VIDEO_HPP

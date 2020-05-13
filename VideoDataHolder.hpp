@@ -28,8 +28,8 @@ public:
 
 	void parseInfoFromFile(const std::string& t_filename);
 	
-	VideoDataHolder& addSeries(SeriesPtr t_series);
-	VideoDataHolder& addMovie(MoviePtr t_movie);
+	VideoDataHolder& addEpisode(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre, const std::string& t_series,  unsigned t_season, unsigned t_episodeNum);
+	VideoDataHolder& addMovie(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre);
 
 	const Video* getVideoById(const std::string& t_videoId) const; // Returns nullptr if video is not found
 	Video* getVideoById(const std::string& t_videoId); // Returns nullptr if video is not found
@@ -47,7 +47,7 @@ public:
 	static std::vector<Video*>& getVideosOfRating(float t_min, float t_max, std::vector<Video*>& t_inVideos, std::vector<Video*>& t_outVideos);
 	
 private:
-	VideoDataHolder& addVideo(Video* t_video);
+	VideoDataHolder& registerVideo(Video* t_video);
 	VideoDataHolder& addVideos(const std::vector<Video*>& t_videos);
 };
 

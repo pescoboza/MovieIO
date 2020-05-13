@@ -24,41 +24,67 @@ void VideoDataHolder::parseInfoFromFile(const std::string& t_filename){
 	for (auto& entry : jf) {
 
 		const auto name{ entry["name"].get<std::string>() };
-		const auto genre{ entry["genre"].get<std::string>() };
 		const auto duration{ entry["duration"].get<unsigned>() };
 		const auto ratings{ entry["ratings"].get<std::vector<float>>() };
 		const auto id{ entry["id"].get<std::string>() };
-		Genre genre{};
-		Video::getVideoTypeFromStr(entry["genre"].get<std::string>(), )
+		Genre genre;
+		{
+			std::string genreStr{ entry["genre"].get<std::string>() };
+			if (!Video::getGenreFromStr(genreStr, genre)) {
+				std::ostringstream error{ "Could not read video type \"" };
+				error << genreStr <<"\".\n";
+				throw std::runtime_error{error.str()};
+			}
+		}
 		
-		// TODO: Finish parsing
+		VideoType type;
+		{
+			std::string typeStr{ entry["type"].get<std::string>() };
+			if (!Video::getVideoTypeFromStr(typeStr, type)) {
+				std::ostringstream error{"Could not read genre \""};
+				error << typeStr << "\".\n";
+				throw std::runtime_error{ error.str() };
+			}
+		}
 
-		if (entry["type"] == "movie") {
-			addMovie(Movie::newMovie(name,id, duration,|));
+		switch (type){
+		case VideoType::MOVIE:
+			addMovie(name, id, duration, genre);
+			break;
+		case VideoType::SERIES_EPISODE: 
+		{
+			std::string series{ entry["series"].get<std::string>() };
+			unsigned season{ entry["season_num"].get<unsigned>() };
+			unsigned episodeNum{ entry["episode_num"].get<unsigned>() };
+			addEpisode(name, id, duration, genre, series, season, episodeNum);
+		}
+			break;
+		default:
+			break;
 		}
 
 	}
 	// TODO: Create file parser
 }
 
-VideoDataHolder& VideoDataHolder::addSeries(SeriesPtr t_series){
-	{
-		auto it{ m_series.find(t_series->getName()) };
-		if (it != m_series.end()) {
-			m_series.erase(it);
-		}
+
+
+
+VideoDataHolder& VideoDataHolder::addEpisode(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre, const std::string& t_series, unsigned t_season, unsigned t_episodeNum){
+	auto it{m_series.find(t_series)};
+	Episode* episode{ nullptr };
+	if (it != m_series.end()) {
+		it->second->addEpisode(t_name, t_id, t_duration, t_genre, t_season, t_episodeNum);
+		episode = it->second->getEpisode(t_season, t_episodeNum);
 	}
-	auto empl_it{ m_series.emplace(t_series->getName(), std::move(t_series)) };
-	std::vector<Video*> episodes;
-	empl_it.first->second->getAllEpisodes(episodes);
-	addVideos(episodes);
+	registerVideo(episode);
 	return *this;
 }
 
-VideoDataHolder& VideoDataHolder::addMovie(MoviePtr t_movie){
-	m_movies.emplace_back(std::move(t_movie));
+VideoDataHolder& VideoDataHolder::addMovie(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre){
+	m_movies.emplace_back(Movie::newMovie(t_name, t_id, t_duration, t_genre));
 	Video* movie{ m_movies.back().get() };
-	addVideo(movie);
+	registerVideo(movie);
 	return *this;
 }
 
@@ -106,13 +132,13 @@ std::vector<Video*>& VideoDataHolder::getVideosOfRating(float t_min, float t_max
 		}, t_inVideos, t_outVideos);
 }
 
-VideoDataHolder& VideoDataHolder::addVideo(Video* t_video){
+VideoDataHolder& VideoDataHolder::registerVideo(Video* t_video){
 	m_videosById.emplace(t_video->getId(), t_video);
 	m_videosByName.emplace(t_video->getName(), t_video);
 	return *this;
 }
 
 VideoDataHolder& VideoDataHolder::addVideos(const std::vector<Video*>& t_videos){
-	for (auto ptr : t_videos) {	addVideo(ptr);}
+	for (auto ptr : t_videos) {	registerVideo(ptr);}
 	return *this;
 }

@@ -12,7 +12,7 @@ class Episode;
 class Season;
 
 using EpisodePtr = std::unique_ptr<Episode>;
-using Episodes = std::vector<EpisodePtr>;
+using Episodes = std::map<unsigned, EpisodePtr>;
 
 using SeasonPtr = std::unique_ptr<Season>;
 using Seasons = std::map<unsigned, SeasonPtr>;
@@ -23,8 +23,9 @@ class Series {
 public:
 	Series(const std::string& t_name);
 	const std::string& getName() const;
-	Series& addSeason();
-	Series& addSeason(unsigned t_number);
+	Series& addEpisode(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre, unsigned t_season, unsigned t_episodeNum);
+	Episode* getEpisode(unsigned t_season, unsigned t_episodeNum);
+	const Episode* getEpisode(unsigned t_season, unsigned t_episodeNum) const;
 	std::vector<Season*>& getAllSeasons(std::vector<Season*>& t_outSeasons) const;
 	std::vector<Episode*>& getAllEpisodes(std::vector<Episode*>& t_outEpisodes) const;
 	std::vector<Video*>& getAllEpisodes(std::vector<Video*>& t_outEpisodes) const;
@@ -42,7 +43,7 @@ class Season {
 public:
 	Series& getSeries();
 	const Series& getSeries() const;
-	Season& addEpisode(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre);
+	Seasons& addEpisode(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre, unsigned t_episodeNum);
 	std::vector<Episode*>& getAllEpisodes(std::vector<Episode*>& t_outEpisodes) const;
 	
 };

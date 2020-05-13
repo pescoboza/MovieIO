@@ -1,5 +1,9 @@
 #include "Video.hpp"
 
+namespace n {
+	const std::string emptyStr{ "" };
+};
+
 const float Video::s_minRating{ 0.f };
 const float Video::s_maxRating{ 5.f };
 
@@ -9,7 +13,7 @@ const GenreMap Video::s_genresStrings{
 	{"mystery", Genre::MYSTERY}
 };
 
-const VideoType Video::s_videoTypesStrings{
+const VideoTypeMap Video::s_videoTypesStrings{
 	{"movie", VideoType::MOVIE},
 	{"episode", VideoType::SERIES_EPISODE}
 };
@@ -39,14 +43,14 @@ Genre Video::getGenre() const { return m_genre; }
 
 void Video::rate(float t_rating) { m_ratings.emplace_back(t_rating); }
 
-const std::string& Video::getGenreStrFromType(Genre t_genre){
+const std::string& Video::getStrFromGenre(Genre t_genre){
 	for (const auto& p : s_genresStrings) {
 		if (t_genre == p.second) { return p.first; }
 	}
-	return "";
+	return n::emptyStr;
 }
 
-bool Video::getGenreTypeFromStr(const std::string& t_str, Genre& t_outGenre){
+bool Video::getGenreFromStr(const std::string& t_str, Genre& t_outGenre){
 	auto it{ s_genresStrings.find(t_str) };
 	if (it != s_genresStrings.cend()) {
 		t_outGenre = it->second;
@@ -64,10 +68,10 @@ bool Video::getVideoTypeFromStr(const std::string& t_str, VideoType& t_outType){
 	return false;
 }
 
-const std::string& Video::getVideoStrFromType(VideoType t_type){
+const std::string& Video::getStrFromVideoType(VideoType t_type){
 	for (const auto & p : s_videoTypesStrings) {
 		if (t_type == p.second) { return p.first; }
 	}
-	return "";
+	return n::emptyStr;
 }
 
