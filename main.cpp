@@ -14,7 +14,10 @@ int main(int argc, char* argv[]) {
 
 		std::cout << "Loading data..." << std::endl;
 		videoSystem.parseInfoFromFile(argv[1]);
-		std::cin.get();
+		
+		// std::vector<Video*> videos;
+		// videoSystem.getVideosOfGenre(,)
+	
 	}
 	catch (std::exception& e){
 		std::cerr << e.what() << std::endl;

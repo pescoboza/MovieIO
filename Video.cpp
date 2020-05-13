@@ -14,9 +14,7 @@ const Video::TableParams Video::s_tbl{
 	16U, // genre
 	16U, // rating
 	16U, // type
-	16U, // seies
-	16U, // season
-	16U, // episode
+	16U, // series
 	'|' ,// separator
 	"ID", 
 	"NAME", 
@@ -25,8 +23,6 @@ const Video::TableParams Video::s_tbl{
 	"RATING", 
 	"TYPE", 
 	"SERIES", 
-	"SEASON", 
-	"EPISODE"
 };
 
 const float Video::s_minRating{ 0.f };
@@ -120,7 +116,7 @@ void Video::print(std::ostream& t_out) const{
 	t_out << sep << ' ' <<
 		std::left << std::setw(t.m_id) << m_id << sep <<
 		std::left << std::setw(t.m_name) << m_name << sep <<
-		std::left << std::setw(t.m_duration) << formattedDuration << sep <<
+		std::left << std::setw(t.m_duration) << formattedDuration() << sep <<
 		std::left << std::setw(t.m_genre) << getStrFromGenre(m_genre) << sep <<
 		std::left << std::setw(t.m_rating) << getRating() << sep <<
 		std::left << std::setw(t.m_type) << getStrFromVideoType(m_type) << sep;
