@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include <vector>
 
+
 enum class Genre;
 enum class VideoType;
 
@@ -34,14 +35,16 @@ private:
 	static const VideoTypeMap s_videoTypesStrings;
 
 protected:
-	
-
 	std::string m_name;
 	std::string m_id;
 	unsigned m_duration;
 	Genre m_genre;
 	VideoType m_type;
 	Ratings m_ratings;
+
+	static const struct TableWidths{
+		unsigned m_id, m_name, m_duration, m_genre, m_rating, m_type;
+	}s_tblw;
 
 
 	Video(const std::string& t_name,  const std::string& t_id, unsigned t_duration, Genre t_genre, VideoType t_type);
@@ -56,7 +59,7 @@ public:
 	void rate(float t_rating);
 	std::string formattedDuration() const;
 
-	virtual void print(std::ostream& t_out = std::cout) const = 0;
+	virtual void print(std::ostream& t_out = std::cout) const;
 
 	static const std::string& getStrFromGenre(Genre t_genre);
 	static bool getGenreFromStr(const std::string& t_str, Genre& t_outGenre);

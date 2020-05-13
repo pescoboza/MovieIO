@@ -1,4 +1,5 @@
 #include "Movie.hpp"
+#include <iomanip>
 #include <memory>
 
 Movie::Movie(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre):
@@ -9,6 +10,8 @@ MoviePtr Movie::newMovie(const std::string& t_name, const std::string& t_id, uns
 }
 
 void Movie::print(std::ostream& t_out) const{
+	
+	
 	
 
 }

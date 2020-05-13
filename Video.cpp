@@ -1,9 +1,14 @@
 #include "Video.hpp"
+#include <iomanip>
 #include <sstream>
 
 namespace n {
 	const std::string emptyStr{ "" };
+
 };
+
+// 		unsigned id, name, duration, genre, rating, type;
+const Video::TableWidths Video::s_tblw{8U, 32U, 8U, 8U, 4U, 8U };
 
 const float Video::s_minRating{ 0.f };
 const float Video::s_maxRating{ 5.f };
@@ -63,6 +68,13 @@ std::string Video::formattedDuration() const{
 	std::ostringstream s;
 	s << hours << ':' << minutesStr << ':' << secondsStr;
 	return s.str();
+}
+
+void Video::print(std::ostream& t_out) const{
+	t_out <<
+		std::left << std::setw(s_tblw.m_id) << m_id <<
+		std::left << std::setw(s_tblw.m_name) << m_name << 
+		std::left << std::setw
 }
 
 const std::string& Video::getStrFromGenre(Genre t_genre){
