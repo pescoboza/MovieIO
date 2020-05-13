@@ -54,7 +54,11 @@ std::vector<Episode*>& Series::getAllEpisodes(std::vector<Episode*>& t_outEpisod
 
 std::vector<Video*>& Series::getAllEpisodes(std::vector<Video*>& t_outEpisodes) const {
 	for (const auto& ssnPair : m_seasons) {
-		ssnPair.second->getAllEpisodes(t_outEpisodes);
+		std::vector<Video*> videos;
+		auto &episodes{ ssnPair.second->m_episodes};
+		for (auto& p : episodes) {
+			t_outEpisodes.push_back(static_cast<Video*>(p.second.get()));
+		}
 	}
 	return t_outEpisodes;
 }
@@ -71,7 +75,7 @@ Series& Season::getSeries() { return m_series; }
 const Series& Season::getSeries() const { return m_series; }
 
 Season& Season::addEpisode(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre, unsigned t_episodeNum){
-	m_episodes.emplace(Episode::newEpisode(t_name, t_id, t_duration, t_genre, *this));
+	m_episodes.emplace(t_episodeNum, Episode::newEpisode(t_name, t_id, t_duration, t_genre, *this));
 	return *this;
 }
 

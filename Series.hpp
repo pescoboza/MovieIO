@@ -43,7 +43,7 @@ class Season {
 public:
 	Series& getSeries();
 	const Series& getSeries() const;
-	Seasons& addEpisode(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre, unsigned t_episodeNum);
+	Season& addEpisode(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre, unsigned t_episodeNum);
 	std::vector<Episode*>& getAllEpisodes(std::vector<Episode*>& t_outEpisodes) const;
 	
 };
