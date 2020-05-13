@@ -3,6 +3,10 @@
 
 Series::Series(const std::string& t_name) : m_name{t_name} {}
 
+SeriesPtr Series::newSeries(const std::string& t_name){
+	return std::make_unique<Series>(t_name);
+}
+
 const std::string& Series::getName() const { return m_name; }
 
 Series& Series::addEpisode(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre, unsigned t_season, unsigned t_episodeNum) {

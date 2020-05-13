@@ -8,8 +8,11 @@
 #include <string>
 #include <vector>
 
-class Episode;
+class Series;
 class Season;
+class Episode;
+
+using SeriesPtr = std::unique_ptr<Series>;
 
 using EpisodePtr = std::unique_ptr<Episode>;
 using Episodes = std::map<unsigned, EpisodePtr>;
@@ -22,6 +25,7 @@ class Series {
 	Seasons m_seasons;
 public:
 	Series(const std::string& t_name);
+	static SeriesPtr newSeries(const std::string& t_name);
 	const std::string& getName() const;
 	Series& addEpisode(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre, unsigned t_season, unsigned t_episodeNum);
 	Episode* getEpisode(unsigned t_season, unsigned t_episodeNum);

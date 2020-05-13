@@ -62,9 +62,7 @@ void VideoDataHolder::parseInfoFromFile(const std::string& t_filename){
 		default:
 			break;
 		}
-
 	}
-	// TODO: Create file parser
 }
 
 
@@ -77,6 +75,15 @@ VideoDataHolder& VideoDataHolder::addEpisode(const std::string& t_name, const st
 		it->second->addEpisode(t_name, t_id, t_duration, t_genre, t_season, t_episodeNum);
 		episode = it->second->getEpisode(t_season, t_episodeNum);
 	}
+	else {
+		auto & series{*m_series.emplace(t_series, Series::newSeries(t_series)).first->second.get()};
+		series.addEpisode(t_name,t_id, t_duration, t_genre, t_season, t_episodeNum);
+		episode = series.getEpisode(t_season, t_episodeNum);
+	}
+	if (!episode) {
+		throw std::runtime_error{"Could not get address of video.\n"};
+	}
+
 	registerVideo(episode);
 	return *this;
 }
