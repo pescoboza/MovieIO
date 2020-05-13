@@ -46,6 +46,8 @@ public:
 	static std::vector<Video*>& getVideosOfGenre(Genre t_genre, std::vector<Video*>& t_inVideos, std::vector<Video*>& t_outVideos);
 	static std::vector<Video*>& getVideosOfRating(float t_min, float t_max, std::vector<Video*>& t_inVideos, std::vector<Video*>& t_outVideos);
 	
+	static void printVideos(const std::vector<Video*>& t_videos);
+
 private:
 	VideoDataHolder& registerVideo(Video* t_video);
 	VideoDataHolder& addVideos(const std::vector<Video*>& t_videos);

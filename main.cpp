@@ -11,7 +11,10 @@ int main(int argc, char* argv[]) {
 		}
 	
 		VideoDataHolder videoSystem;
+
+		std::cout << "Loading data..." << std::endl;
 		videoSystem.parseInfoFromFile(argv[1]);
+		std::cin.get();
 	}
 	catch (std::exception& e){
 		std::cerr << e.what() << std::endl;
@@ -19,3 +22,6 @@ int main(int argc, char* argv[]) {
 	}
 	return 0;
 }
+
+// TODO: Debug parsing.
+// TODO: Create user interface.

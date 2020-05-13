@@ -1,6 +1,7 @@
 #ifndef VIDEO_HPP
 #define VIDEO_HPP
 
+#include <iostream>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -53,6 +54,9 @@ public:
 	VideoType getType() const;
 	unsigned getDuration() const;
 	void rate(float t_rating);
+	std::string formattedDuration() const;
+
+	virtual void print(std::ostream& t_out = std::cout) const = 0;
 
 	static const std::string& getStrFromGenre(Genre t_genre);
 	static bool getGenreFromStr(const std::string& t_str, Genre& t_outGenre);

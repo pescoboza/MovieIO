@@ -1,4 +1,5 @@
 #include "Video.hpp"
+#include <sstream>
 
 namespace n {
 	const std::string emptyStr{ "" };
@@ -42,6 +43,27 @@ unsigned Video::getDuration() const {return m_duration;}
 Genre Video::getGenre() const { return m_genre; }
 
 void Video::rate(float t_rating) { m_ratings.emplace_back(t_rating); }
+
+std::string Video::formattedDuration() const{
+	unsigned minutes{ m_duration / 60 };
+	unsigned hours{ minutes / 60 };
+	minutes %= 60;
+	unsigned seconds = m_duration % 60;
+
+	std::string minutesStr{ std::to_string(minutes) };
+	if (minutesStr.size() == 1U) {
+		minutesStr = '0' + minutesStr;
+	}
+
+	std::string secondsStr{ std::to_string(seconds) };
+	if (secondsStr.size() == 1U) {
+		secondsStr = '0' + secondsStr;
+	}
+
+	std::ostringstream s;
+	s << hours << ':' << minutesStr << ':' << secondsStr;
+	return s.str();
+}
 
 const std::string& Video::getStrFromGenre(Genre t_genre){
 	for (const auto& p : s_genresStrings) {

@@ -139,6 +139,14 @@ std::vector<Video*>& VideoDataHolder::getVideosOfRating(float t_min, float t_max
 		}, t_inVideos, t_outVideos);
 }
 
+void VideoDataHolder::printVideos(const std::vector<Video*>& t_videos){
+	for (const auto vid : t_videos) {
+		if (!vid) { continue; }
+		
+	}
+
+}
+
 VideoDataHolder& VideoDataHolder::registerVideo(Video* t_video){
 	m_videosById.emplace(t_video->getId(), t_video);
 	m_videosByName.emplace(t_video->getName(), t_video);
