@@ -12,7 +12,8 @@ class Movie : public Video{
 public:
 	Movie(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre);
 	static MoviePtr newMovie(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre);
-	void print(std::ostream& t_out = std::cout) const;
+
+	friend std::ostream& operator<<(std::ostream& t_out, const Movie& t_movie);
 };
 
 #endif // !MOVIE_HPP

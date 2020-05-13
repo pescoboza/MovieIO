@@ -9,9 +9,7 @@ MoviePtr Movie::newMovie(const std::string& t_name, const std::string& t_id, uns
 	return std::make_unique<Movie>(t_name, t_id, t_duration, t_genre);
 }
 
-void Movie::print(std::ostream& t_out) const{
-	
-	
-	
-
+std::ostream& operator<<(std::ostream& t_out, const Movie& t_movie){
+	t_movie.print(t_out);
+	return t_out;
 }

@@ -7,8 +7,27 @@ namespace n {
 
 };
 
-// 		unsigned id, name, duration, genre, rating, type;
-const Video::TableWidths Video::s_tblw{8U, 32U, 8U, 8U, 4U, 8U };
+const Video::TableParams Video::s_tbl{
+	16U, // id
+	16U, // name 
+	16U, // duration
+	16U, // genre
+	16U, // rating
+	16U, // type
+	16U, // seies
+	16U, // season
+	16U, // episode
+	'|' ,// separator
+	"ID", 
+	"NAME", 
+	"DURATION", 
+	"GENRE", 
+	"RATING", 
+	"TYPE", 
+	"SERIES", 
+	"SEASON", 
+	"EPISODE"
+};
 
 const float Video::s_minRating{ 0.f };
 const float Video::s_maxRating{ 5.f };
@@ -70,11 +89,41 @@ std::string Video::formattedDuration() const{
 	return s.str();
 }
 
+
+void Video::printTableHeader(VideoType t_type, std::ostream& t_out){
+	const auto& sep{ s_tbl.m_separator };
+	const auto& t{ s_tbl };
+	
+	t_out << sep << ' ' <<
+		std::left << std::setw(t.m_id) << t.m_idHeader << sep <<
+		std::left << std::setw(t.m_name) << t.m_nameHeader << sep <<
+		std::left << std::setw(t.m_duration) << t.m_durationHeader << sep <<
+		std::left << std::setw(t.m_genre) << t.m_genreHeader << sep <<
+		std::left << std::setw(t.m_rating) << t.m_ratingHeader << sep <<
+		std::left << std::setw(t.m_type) << t.m_typeHeader << sep;
+	
+	switch (t_type)	{
+	case VideoType::MOVIE:
+		break;
+	case VideoType::SERIES_EPISODE:
+		t_out <<
+			std::left << std::setw(t.m_series) << t.m_seriesHeader << sep;
+		break;
+	default:
+		break;
+	}
+}
+
 void Video::print(std::ostream& t_out) const{
-	t_out <<
-		std::left << std::setw(s_tblw.m_id) << m_id <<
-		std::left << std::setw(s_tblw.m_name) << m_name << 
-		std::left << std::setw
+	const auto& sep{ s_tbl.m_separator };
+	const auto& t{ s_tbl };
+	t_out << sep << ' ' <<
+		std::left << std::setw(t.m_id) << m_id << sep <<
+		std::left << std::setw(t.m_name) << m_name << sep <<
+		std::left << std::setw(t.m_duration) << formattedDuration << sep <<
+		std::left << std::setw(t.m_genre) << getStrFromGenre(m_genre) << sep <<
+		std::left << std::setw(t.m_rating) << getRating() << sep <<
+		std::left << std::setw(t.m_type) << getStrFromVideoType(m_type) << sep;
 }
 
 const std::string& Video::getStrFromGenre(Genre t_genre){
@@ -109,3 +158,7 @@ const std::string& Video::getStrFromVideoType(VideoType t_type){
 	return n::emptyStr;
 }
 
+std::ostream& operator<<(std::ostream& t_out, const Video& t_video){
+	t_video.print(t_out);
+	return t_out;
+}

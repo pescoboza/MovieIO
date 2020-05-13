@@ -1,4 +1,6 @@
 #include "Series.hpp"
+#include <iostream>
+#include <iomanip>
 #include <stdexcept>
 
 Series::Series(const std::string& t_name) : m_name{t_name} {}
@@ -67,7 +69,7 @@ std::vector<Video*>& Series::getAllEpisodes(std::vector<Video*>& t_outEpisodes) 
 	return t_outEpisodes;
 }
 
-Season::Season(Series& t_series) : m_series{ t_series } {}
+Season::Season(Series& t_series) : m_series{ t_series }{}
 
 SeasonPtr Season::newSeason(Series& t_series){	
 	Season s{t_series};
@@ -77,6 +79,7 @@ SeasonPtr Season::newSeason(Series& t_series){
 Series& Season::getSeries() { return m_series; }
 
 const Series& Season::getSeries() const { return m_series; }
+
 
 Season& Season::addEpisode(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre, unsigned t_episodeNum){
 	m_episodes.emplace(t_episodeNum, Episode::newEpisode(t_name, t_id, t_duration, t_genre, *this));
@@ -102,3 +105,19 @@ EpisodePtr Episode::newEpisode(const std::string& t_name, const std::string& t_i
 Season& Episode::getSeason() { return m_season; }
 
 const Season& Episode::getSeason() const { return m_season; }
+
+void Episode::print(std::ostream& t_out) const{
+	Video::print(t_out);
+	
+	const auto& sep{ s_tbl.m_separator };
+	const auto& t{ s_tbl };
+	
+	const auto& series{getSeason().getSeries().getName()};
+	t_out <<
+		std::left << std::setw(t.m_series) << series << sep;
+}
+
+std::ostream& operator<<(std::ostream& t_out, const Episode& t_episode){
+	t_episode.print(t_out);
+	return t_out;
+}

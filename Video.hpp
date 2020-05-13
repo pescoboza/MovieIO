@@ -42,9 +42,23 @@ protected:
 	VideoType m_type;
 	Ratings m_ratings;
 
-	static const struct TableWidths{
-		unsigned m_id, m_name, m_duration, m_genre, m_rating, m_type;
-	}s_tblw;
+	static const struct TableParams{
+		unsigned m_id;
+		unsigned m_name;
+		unsigned m_duration;
+		unsigned m_genre; 
+		unsigned m_rating;
+		unsigned m_type;
+		unsigned m_series;
+		char m_separator;
+		std::string m_idHeader;
+		std::string m_nameHeader;
+		std::string m_durationHeader;
+		std::string m_genreHeader;
+		std::string m_ratingHeader;
+		std::string m_typeHeader;
+		std::string m_seriesHeader;
+	}s_tbl;
 
 
 	Video(const std::string& t_name,  const std::string& t_id, unsigned t_duration, Genre t_genre, VideoType t_type);
@@ -59,12 +73,15 @@ public:
 	void rate(float t_rating);
 	std::string formattedDuration() const;
 
+	static void printTableHeader(VideoType t_type, std::ostream& t_out = std::cout);
 	virtual void print(std::ostream& t_out = std::cout) const;
 
 	static const std::string& getStrFromGenre(Genre t_genre);
 	static bool getGenreFromStr(const std::string& t_str, Genre& t_outGenre);
 	static bool getVideoTypeFromStr(const std::string& t_str, VideoType& t_outType);
 	static const std::string& getStrFromVideoType(VideoType t_type);
+
+	friend std::ostream& operator<<(std::ostream& t_out, const Video& t_video);
 };
 
 #endif // !VIDEO_HPP
