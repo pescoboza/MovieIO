@@ -6,6 +6,11 @@
 
 namespace js = nlohmann;
 
+const std::string VideoDataHolder::s_initMsg{
+R"(Usage)"
+};
+
+
 VideoDataHolder::VideoDataHolder() : m_videosById{}, m_movies{}, m_series{}{}
 
 void VideoDataHolder::parseInfoFromFile(const std::string& t_filename){
@@ -65,6 +70,13 @@ void VideoDataHolder::parseInfoFromFile(const std::string& t_filename){
 	}
 }
 
+void VideoDataHolder::start(){
+	
+	std::cout << ""
+	input();
+
+}
+
 
 
 
@@ -95,6 +107,12 @@ VideoDataHolder& VideoDataHolder::addMovie(const std::string& t_name, const std:
 	return *this;
 }
 
+std::string VideoDataHolder::input(std::istream& t_in){
+	std::string str{""};
+	std::getline(t_in, str);
+	return str;
+}
+
 const Video* VideoDataHolder::getVideoById(const std::string& t_videoId) const{
 	auto it{ m_videosById.find(t_videoId) };
 	return it != m_videosById.cend() ? it->second : nullptr;
@@ -123,6 +141,10 @@ std::vector<Movie*>& VideoDataHolder::getMovies(std::vector<Movie*>& t_outMovies
 	return t_outMovies;
 }
 
+std::vector<Video*>& VideoDataHolder::getVideosOfGenre(Genre t_genre, std::vector<Video*>& t_outVideos) const{
+
+}
+
 std::vector<Video*>& VideoDataHolder::getVideosOfGenre(Genre t_genre, std::vector<Video*>& t_inVideos,std::vector<Video*>& t_outVideos){
 	return filter([&t_genre](const Video& t_video) {
 		return t_genre == t_video.getGenre();
@@ -147,9 +169,44 @@ void VideoDataHolder::printVideos(const std::vector<Video*>& t_videos){
 
 }
 
+void VideoDataHolder::getVideos(const std::string& t_name, const std::string& t_genre, const std::string& t_series, const std::pair<float, float>& t_rating) const{
+
+	auto filt{ [&](const Video& t_video) {
+		
+		// Check name matches
+		if (!t_name.empty() && t_name != t_video.getName()) {return false;}
+		
+		// Check genre matches
+		{
+			Genre genre;
+			if (!t_genre.empty() && Video::getGenreFromStr(t_genre, genre) && genre != t_video.getGenre()) { return false; }
+		}
+
+		// Check rating matches
+		{
+			const auto& min{t_rating.first};
+			const auto& max{t_rating.second};
+			auto r{t_video.getRating()};
+			if (r < min || r > max) {
+				return false;
+			}
+		}
+
+		// Check series matches
+		if (!t_series.empty() && t_video.getType() == VideoType::SERIES_EPISODE && 
+			t_series != dynamic_cast<const Episode*>(&t_video)->getSeason().getSeries().getName()) {
+			return false;
+		}
+
+		return true;
+	}};
+
+}
+
 VideoDataHolder& VideoDataHolder::registerVideo(Video* t_video){
 	m_videosById.emplace(t_video->getId(), t_video);
 	m_videosByName.emplace(t_video->getName(), t_video);
+	m_videosVec.push_back(t_video);
 	return *this;
 }
 

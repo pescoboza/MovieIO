@@ -9,7 +9,8 @@
 #include <string>
 #include <vector>
 
-using Videos = std::unordered_map<std::string, Video*>; // non data-owning ptr
+using VideosMap = std::unordered_map<std::string, Video*>; // non data-owning ptr
+using VideosVec = std::vector<Video*>; 
 using MoviePtr = std::unique_ptr<Movie>;
 using MoviesVec = std::vector<MoviePtr>;
 using SeriesPtr = std::unique_ptr<Series>;
@@ -17,19 +18,18 @@ using SeriesMap = std::unordered_map<std::string,SeriesPtr>;
 
 class VideoDataHolder {
 	
-	Videos m_videosById;
-	Videos m_videosByName;
+	VideosMap m_videosById;
+	VideosMap m_videosByName;
+	VideosVec m_videosVec;
 
 	MoviesVec m_movies;
 	SeriesMap m_series;
 
 public:
 	VideoDataHolder();
-
 	void parseInfoFromFile(const std::string& t_filename);
-	
-	VideoDataHolder& addEpisode(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre, const std::string& t_series,  unsigned t_season, unsigned t_episodeNum);
-	VideoDataHolder& addMovie(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre);
+	void start();
+
 
 	const Video* getVideoById(const std::string& t_videoId) const; // Returns nullptr if video is not found
 	Video* getVideoById(const std::string& t_videoId); // Returns nullptr if video is not found
@@ -39,22 +39,36 @@ public:
 	
 	std::vector<Movie*>& getMovies(std::vector<Movie*>& t_outMovies);
 
+
 	// Returns all the video entries that match the filter function
 	template <typename Functor>
-	static std::vector<Video*>& filter(Functor t_filter, std::vector<Video*> t_inVideos, std::vector<Video*>& t_outVideos);
-
-	static std::vector<Video*>& getVideosOfGenre(Genre t_genre, std::vector<Video*>& t_inVideos, std::vector<Video*>& t_outVideos);
-	static std::vector<Video*>& getVideosOfRating(float t_min, float t_max, std::vector<Video*>& t_inVideos, std::vector<Video*>& t_outVideos);
+	static VideosVec& filter(Functor t_filter, VideosVec t_inVideos, VideosVec& t_outVideos);
+	static VideosVec& getVideosOfGenre(Genre t_genre, VideosVec& t_inVideos, VideosVec& t_outVideos);
+	static VideosVec& getVideosOfRating(float t_min, float t_max, VideosVec& t_inVideos, VideosVec& t_outVideos);
 	
-	static void printVideos(const std::vector<Video*>& t_videos);
+	static void printVideos(const VideosVec& t_videos);
+
+	void getVideos(const std::string& t_name = "",
+		const std::string& t_genre = "",
+		const std::string& t_series = "",
+		const std::pair<float, float>& t_rating = {Video::s_minRating, Video::s_maxRating}) const;
+
 
 private:
+	static const std::string s_initMsg;
+
+
 	VideoDataHolder& registerVideo(Video* t_video);
-	VideoDataHolder& addVideos(const std::vector<Video*>& t_videos);
+	VideoDataHolder& addVideos(const VideosVec& t_videos);
+
+	VideoDataHolder& addEpisode(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre, const std::string& t_series, unsigned t_season, unsigned t_episodeNum);
+	VideoDataHolder& addMovie(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre);
+
+	static std::string input(std::istream& t_in = std::cin);
 };
 
 template<typename Functor>
-inline std::vector<Video*>& VideoDataHolder::filter(Functor t_filter, std::vector<Video*> t_inVideos, std::vector<Video*>& t_outVideos){
+inline VideosVec& VideoDataHolder::filter(Functor t_filter, VideosVec t_inVideos, VideosVec& t_outVideos){
 	for (auto vidPtr : t_inVideos) {
 		if (t_filter(*vidPtr)) {
 			t_outVideos.push_back(vidPtr);
