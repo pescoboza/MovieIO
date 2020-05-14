@@ -50,7 +50,7 @@ protected:
 		unsigned m_rating;
 		unsigned m_type;
 		unsigned m_series;
-		char m_separator;
+		std::string m_separator;
 		std::string m_idHeader;
 		std::string m_nameHeader;
 		std::string m_durationHeader;

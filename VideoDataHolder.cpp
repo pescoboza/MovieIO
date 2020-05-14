@@ -30,8 +30,13 @@ void VideoDataHolder::parseInfoFromFile(const std::string& t_filename){
 
 		const auto name{ entry["name"].get<std::string>() };
 		const auto duration{ entry["duration"].get<unsigned>() };
-		const auto ratings{ entry["ratings"].get<std::vector<float>>() };
 		const auto id{ entry["id"].get<std::string>() };
+		
+		Ratings ratings;
+		for (const auto& r : entry["ratings"][0]) {
+			ratings.push_back(r.get<float>());
+		}
+		
 		Genre genre;
 		{
 			std::string genreStr{ entry["genre"].get<std::string>() };
@@ -54,14 +59,14 @@ void VideoDataHolder::parseInfoFromFile(const std::string& t_filename){
 
 		switch (type){
 		case VideoType::MOVIE:
-			addMovie(name, id, duration, genre);
+			addMovie(name, id, duration, genre, ratings);
 			break;
 		case VideoType::SERIES_EPISODE: 
 		{
 			std::string series{ entry["series"].get<std::string>() };
 			unsigned season{ entry["season_num"].get<unsigned>() };
 			unsigned episodeNum{ entry["episode_num"].get<unsigned>() };
-			addEpisode(name, id, duration, genre, series, season, episodeNum);
+			addEpisode(name, id, duration, genre, series, season, episodeNum, ratings);
 		}
 			break;
 		default:
@@ -78,9 +83,7 @@ void VideoDataHolder::start(){
 }
 
 
-
-
-VideoDataHolder& VideoDataHolder::addEpisode(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre, const std::string& t_series, unsigned t_season, unsigned t_episodeNum){
+VideoDataHolder& VideoDataHolder::addEpisode(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre, const std::string& t_series, unsigned t_season, unsigned t_episodeNum, const Ratings& t_ratings) {
 	auto it{m_series.find(t_series)};
 	Episode* episode{ nullptr };
 	if (it != m_series.end()) {
@@ -96,13 +99,20 @@ VideoDataHolder& VideoDataHolder::addEpisode(const std::string& t_name, const st
 		throw std::runtime_error{"Could not get address of video.\n"};
 	}
 
+	for (const auto r : t_ratings) {
+		episode->rate(r);
+	}
+
 	registerVideo(episode);
 	return *this;
 }
 
-VideoDataHolder& VideoDataHolder::addMovie(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre){
+VideoDataHolder& VideoDataHolder::addMovie(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre, const Ratings& t_ratings){
 	m_movies.emplace_back(Movie::newMovie(t_name, t_id, t_duration, t_genre));
 	Video* movie{ m_movies.back().get() };
+	for (const auto& r : t_ratings) {
+		movie->rate(r);
+	}
 	registerVideo(movie);
 	return *this;
 }
@@ -142,14 +152,18 @@ std::vector<Movie*>& VideoDataHolder::getMovies(std::vector<Movie*>& t_outMovies
 }
 
 
-void VideoDataHolder::printVideos(const VideosVec& t_videos, bool t_printHeader, std::ostream& t_out){
+void VideoDataHolder::printVideos(const VideosVec& t_videos, unsigned t_numEntries, bool t_printHeader, std::ostream& t_out){
 	if (t_printHeader == true) {
 		Video::printTableHeader(t_out);
+		t_out << '\n';
 	}
 
+	unsigned counter{ 1U };
 	for (const auto video : t_videos) {
 		const auto& ref{ *video };
-		t_out << ref;
+		t_out << ref << '\n';
+		if (counter == t_numEntries) { break; }
+		counter++;
 	}
 }
 
@@ -191,7 +205,6 @@ VideosVec& VideoDataHolder::getVideos(VideosVec& t_outVideos, const std::string&
 
 VideoDataHolder& VideoDataHolder::registerVideo(Video* t_video){
 	m_videosById.emplace(t_video->getId(), t_video);
-	m_videosByName.emplace(t_video->getName(), t_video);
 	m_videosVec.push_back(t_video);
 	return *this;
 }

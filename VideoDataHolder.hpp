@@ -19,7 +19,6 @@ using SeriesMap = std::unordered_map<std::string,SeriesPtr>;
 class VideoDataHolder {
 	
 	VideosMap m_videosById;
-	VideosMap m_videosByName;
 	VideosVec m_videosVec;
 
 	MoviesVec m_movies;
@@ -44,7 +43,7 @@ public:
 	template <typename Functor>
 	static VideosVec& filter(Functor t_filter, VideosVec t_inVideos, VideosVec& t_outVideos);
 	
-	static void printVideos(const VideosVec& t_videos, bool t_printHeader, std::ostream& t_out = std::cout);
+	static void printVideos(const VideosVec& t_videos, unsigned t_numEntries, bool t_printHeader = true, std::ostream& t_out = std::cout);
 
 	VideosVec& getVideos(VideosVec& t_outVideos, const std::string& t_name = "",
 		const std::string& t_genre = "",
@@ -57,10 +56,11 @@ private:
 
 
 	VideoDataHolder& registerVideo(Video* t_video);
-	VideoDataHolder& addVideos(const VideosVec& t_videos);
 
-	VideoDataHolder& addEpisode(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre, const std::string& t_series, unsigned t_season, unsigned t_episodeNum);
-	VideoDataHolder& addMovie(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre);
+	VideoDataHolder& addVideos(const std::vector<Video*>& t_videos);
+
+	VideoDataHolder& addEpisode(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre, const std::string& t_series, unsigned t_season, unsigned t_episodeNum, const Ratings& t_ratings = {});
+	VideoDataHolder& addMovie(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre, const Ratings& t_ratings = {});
 
 	static std::string input(std::istream& t_in = std::cin);
 };

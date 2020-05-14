@@ -16,8 +16,8 @@ int main(int argc, char* argv[]) {
 		videoSystem.parseInfoFromFile(argv[1]);
 		
 		VideosVec videos;
-		videoSystem.getVideos(videos, "", "mystery");
-		VideoDataHolder::printVideos(videos);
+		videoSystem.getVideos(videos, "", "drama", "", {4.f, 5.f});
+		VideoDataHolder::printVideos(videos, 0U);
 	
 	}
 	catch (std::exception& e){

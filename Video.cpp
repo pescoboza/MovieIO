@@ -9,13 +9,13 @@ namespace n {
 
 const Video::TableParams Video::s_tbl{
 	16U, // id
-	16U, // name 
+	42U, // name 
 	16U, // duration
-	16U, // genre
-	16U, // rating
-	16U, // type
-	16U, // series
-	'|' ,// separator
+	8U, // genre
+	8U, // rating
+	8U, // type
+	32U, // series
+	" | " ,// separator
 	"ID", 
 	"NAME", 
 	"DURATION", 
@@ -51,7 +51,7 @@ float Video::getRating() const {
 		accRating += rating;
 		size++;
 	}
-	return accRating / size;
+	return size != 0 ? accRating / size : 0;
 }
 
 const std::string& Video::getId() const { return m_id; }
@@ -107,7 +107,7 @@ void Video::print(std::ostream& t_out) const{
 		std::left << std::setw(t.m_name) << m_name << sep <<
 		std::left << std::setw(t.m_duration) << formattedDuration() << sep <<
 		std::left << std::setw(t.m_genre) << getStrFromGenre(m_genre) << sep <<
-		std::left << std::setw(t.m_rating) << getRating() << sep <<
+		std::left << std::setw(t.m_rating) << std::fixed << std::setprecision(1) <<  getRating() << sep <<
 		std::left << std::setw(t.m_type) << getStrFromVideoType(m_type) << sep;
 }
 
