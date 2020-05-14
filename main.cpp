@@ -18,7 +18,8 @@ int main(int argc, char* argv[]) {
 		VideosVec videos;
 		videoSystem.getVideos(videos, "", "drama", "", {4.f, 5.f});
 		VideoDataHolder::printVideos(videos, 0U);
-	
+		
+	// TODO: Add main loop
 	}
 	catch (std::exception& e){
 		std::cerr << e.what() << std::endl;
