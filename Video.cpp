@@ -9,7 +9,7 @@ namespace n {
 
 const Video::TableParams Video::s_tbl{
 	16U, // id
-	42U, // name 
+	64U, // name 
 	16U, // duration
 	8U, // genre
 	8U, // rating

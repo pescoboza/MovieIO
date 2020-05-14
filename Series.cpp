@@ -106,6 +106,25 @@ Season& Episode::getSeason() { return m_season; }
 
 const Season& Episode::getSeason() const { return m_season; }
 
+const std::string& Episode::getSeriesName() const{
+	return m_season.getSeries().getName();
+}
+
+void Episode::print(std::ostream& t_out) const{
+	const auto& sep{ s_tbl.m_separator };
+	const auto& t{ s_tbl };
+	std::string seriesNameSep{ " - " };
+	std::string seriesNameAndEpisodeName { getSeriesName()  + seriesNameSep + m_name};
+
+	t_out << sep << ' ' <<
+		std::left << std::setw(t.m_id) << m_id << sep <<
+		std::left << std::setw(t.m_name) << seriesNameAndEpisodeName << sep <<
+		std::left << std::setw(t.m_duration) << formattedDuration() << sep <<
+		std::left << std::setw(t.m_genre) << getStrFromGenre(m_genre) << sep <<
+		std::left << std::setw(t.m_rating) << std::fixed << std::setprecision(1) << getRating() << sep <<
+		std::left << std::setw(t.m_type) << getStrFromVideoType(m_type) << sep;
+}
+
 std::ostream& operator<<(std::ostream& t_out, const Episode& t_episode){
 	t_episode.print(t_out);
 	return t_out;
