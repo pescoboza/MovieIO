@@ -86,7 +86,7 @@ std::string Video::formattedDuration() const{
 }
 
 
-void Video::printTableHeader(VideoType t_type, std::ostream& t_out){
+void Video::printTableHeader(std::ostream& t_out){
 	const auto& sep{ s_tbl.m_separator };
 	const auto& t{ s_tbl };
 	
@@ -96,18 +96,7 @@ void Video::printTableHeader(VideoType t_type, std::ostream& t_out){
 		std::left << std::setw(t.m_duration) << t.m_durationHeader << sep <<
 		std::left << std::setw(t.m_genre) << t.m_genreHeader << sep <<
 		std::left << std::setw(t.m_rating) << t.m_ratingHeader << sep <<
-		std::left << std::setw(t.m_type) << t.m_typeHeader << sep;
-	
-	switch (t_type)	{
-	case VideoType::MOVIE:
-		break;
-	case VideoType::SERIES_EPISODE:
-		t_out <<
-			std::left << std::setw(t.m_series) << t.m_seriesHeader << sep;
-		break;
-	default:
-		break;
-	}
+		std::left << std::setw(t.m_type) << t.m_typeHeader << sep;	
 }
 
 void Video::print(std::ostream& t_out) const{

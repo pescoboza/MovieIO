@@ -15,8 +15,9 @@ int main(int argc, char* argv[]) {
 		std::cout << "Loading data..." << std::endl;
 		videoSystem.parseInfoFromFile(argv[1]);
 		
-		// std::vector<Video*> videos;
-		// videoSystem.getVideosOfGenre(,)
+		VideosVec videos;
+		videoSystem.getVideos(videos, "", "mystery");
+		VideoDataHolder::printVideos(videos);
 	
 	}
 	catch (std::exception& e){

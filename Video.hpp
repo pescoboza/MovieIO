@@ -73,7 +73,7 @@ public:
 	void rate(float t_rating);
 	std::string formattedDuration() const;
 
-	static void printTableHeader(VideoType t_type, std::ostream& t_out = std::cout);
+	static void printTableHeader(std::ostream& t_out = std::cout);
 	virtual void print(std::ostream& t_out = std::cout) const;
 
 	static const std::string& getStrFromGenre(Genre t_genre);

@@ -63,7 +63,6 @@ class Episode : public Video {
 public:
 	Season& getSeason();
 	const Season& getSeason() const;
-	void print(std::ostream& t_out = std::cout) const;
 
 	friend std::ostream& operator<<(std::ostream& t_out, const Episode& t_episode);
 };

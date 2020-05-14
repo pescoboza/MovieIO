@@ -44,7 +44,7 @@ public:
 	template <typename Functor>
 	static VideosVec& filter(Functor t_filter, VideosVec t_inVideos, VideosVec& t_outVideos);
 	
-	static void printVideos(const VideosVec& t_videos);
+	static void printVideos(const VideosVec& t_videos, bool t_printHeader, std::ostream& t_out = std::cout);
 
 	VideosVec& getVideos(VideosVec& t_outVideos, const std::string& t_name = "",
 		const std::string& t_genre = "",

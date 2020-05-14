@@ -106,17 +106,6 @@ Season& Episode::getSeason() { return m_season; }
 
 const Season& Episode::getSeason() const { return m_season; }
 
-void Episode::print(std::ostream& t_out) const{
-	Video::print(t_out);
-	
-	const auto& sep{ s_tbl.m_separator };
-	const auto& t{ s_tbl };
-	
-	const auto& series{getSeason().getSeries().getName()};
-	t_out <<
-		std::left << std::setw(t.m_series) << series << sep;
-}
-
 std::ostream& operator<<(std::ostream& t_out, const Episode& t_episode){
 	t_episode.print(t_out);
 	return t_out;
