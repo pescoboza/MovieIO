@@ -169,9 +169,9 @@ void VideoDataHolder::printVideos(const std::vector<Video*>& t_videos){
 
 }
 
-void VideoDataHolder::getVideos(const std::string& t_name, const std::string& t_genre, const std::string& t_series, const std::pair<float, float>& t_rating) const{
+VideosVec& VideoDataHolder::getVideos(VideosVec& t_outVideos, const std::string& t_name, const std::string& t_genre, const std::string& t_series, const std::pair<float, float>& t_rating) const{
 
-	auto filt{ [&](const Video& t_video) {
+	auto filterFunction{ [&](const Video& t_video) {
 		
 		// Check name matches
 		if (!t_name.empty() && t_name != t_video.getName()) {return false;}
@@ -201,6 +201,8 @@ void VideoDataHolder::getVideos(const std::string& t_name, const std::string& t_
 		return true;
 	}};
 
+	filter(filterFunction, m_videosVec, t_outVideos);
+	return t_outVideos;
 }
 
 VideoDataHolder& VideoDataHolder::registerVideo(Video* t_video){

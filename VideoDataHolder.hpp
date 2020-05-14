@@ -43,12 +43,10 @@ public:
 	// Returns all the video entries that match the filter function
 	template <typename Functor>
 	static VideosVec& filter(Functor t_filter, VideosVec t_inVideos, VideosVec& t_outVideos);
-	static VideosVec& getVideosOfGenre(Genre t_genre, VideosVec& t_inVideos, VideosVec& t_outVideos);
-	static VideosVec& getVideosOfRating(float t_min, float t_max, VideosVec& t_inVideos, VideosVec& t_outVideos);
 	
 	static void printVideos(const VideosVec& t_videos);
 
-	void getVideos(const std::string& t_name = "",
+	VideosVec& getVideos(VideosVec& t_outVideos, const std::string& t_name = "",
 		const std::string& t_genre = "",
 		const std::string& t_series = "",
 		const std::pair<float, float>& t_rating = {Video::s_minRating, Video::s_maxRating}) const;
@@ -69,8 +67,9 @@ private:
 
 template<typename Functor>
 inline VideosVec& VideoDataHolder::filter(Functor t_filter, VideosVec t_inVideos, VideosVec& t_outVideos){
-	for (auto vidPtr : t_inVideos) {
-		if (t_filter(*vidPtr)) {
+	for (const auto vidPtr : t_inVideos) {
+		const auto& constVid = *vidPtr;
+		if (t_filter(constVid)) {
 			t_outVideos.push_back(vidPtr);
 		}
 	}
