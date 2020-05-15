@@ -17,8 +17,8 @@ int main(int argc, char* argv[]) {
 		videoSystem.parseInfoFromFile(argv[1]);
 		
 		VideosVec videos;
-		videoSystem.getVideos(videos, "", "drama", "", {4.f, 5.f});
-		VideoDataHolder::printVideos(videos, 0U);
+		videoSystem.getVideos(videos, "", "", "", {0.f, 5.f});
+		VideoDataHolder::printVideos(videos, 10U);
 		
 	// TODO: Add main loop
 
