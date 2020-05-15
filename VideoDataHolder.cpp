@@ -1,6 +1,5 @@
 #include "VideoDataHolder.hpp"
 #include <fstream>
-#include <sstream>
 #include <stdexcept>
 #include "json.hpp" // Credits to https://github.com/nlohmann/json
 
@@ -18,9 +17,7 @@ void VideoDataHolder::parseInfoFromFile(const std::string& t_filename){
 	file.open(t_filename);
 	if (!file.is_open()) {
 		file.close();
-		std::ostringstream errMsg;
-		errMsg << "Could not open file \"" << t_filename << "\".\n";
-		throw std::runtime_error{errMsg.str()};
+		throw std::runtime_error{ { "Could not open file \"" + t_filename + "\".\n" } };
 	}
 
 	js::json jf{ js::json::parse(file) };
@@ -41,9 +38,7 @@ void VideoDataHolder::parseInfoFromFile(const std::string& t_filename){
 		{
 			std::string genreStr{ entry["genre"].get<std::string>() };
 			if (!Video::getGenreFromStr(genreStr, genre)) {
-				std::ostringstream error{ "Could not read video type \"" };
-				error << genreStr <<"\".\n";
-				throw std::runtime_error{error.str()};
+					throw std::runtime_error{ {"Could not read video type \"" + genreStr + "\".\n"} };
 			}
 		}
 		
@@ -51,9 +46,7 @@ void VideoDataHolder::parseInfoFromFile(const std::string& t_filename){
 		{
 			std::string typeStr{ entry["type"].get<std::string>() };
 			if (!Video::getVideoTypeFromStr(typeStr, type)) {
-				std::ostringstream error{"Could not read genre \""};
-				error << typeStr << "\".\n";
-				throw std::runtime_error{ error.str() };
+				throw std::runtime_error{ {"Could not read genre \""+ typeStr + "\".\n" } };
 			}
 		}
 
@@ -70,6 +63,7 @@ void VideoDataHolder::parseInfoFromFile(const std::string& t_filename){
 		}
 			break;
 		default:
+			throw std::runtime_error{ "Unrecognized video type.\n" };
 			break;
 		}
 	}
@@ -110,9 +104,7 @@ VideoDataHolder& VideoDataHolder::addEpisode(const std::string& t_name, const st
 VideoDataHolder& VideoDataHolder::addMovie(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre, const Ratings& t_ratings){
 	m_movies.emplace_back(Movie::newMovie(t_name, t_id, t_duration, t_genre));
 	Video* movie{ m_movies.back().get() };
-	for (const auto& r : t_ratings) {
-		movie->rate(r);
-	}
+	for (const auto& r : t_ratings) {movie->rate(r);}
 	registerVideo(movie);
 	return *this;
 }
@@ -204,8 +196,17 @@ VideosVec& VideoDataHolder::getVideos(VideosVec& t_outVideos, const std::string&
 }
 
 VideoDataHolder& VideoDataHolder::registerVideo(Video* t_video){
-	m_videosById.emplace(t_video->getId(), t_video);
-	m_videosVec.push_back(t_video);
+	auto it{ m_videosById.emplace(t_video->getId(), t_video) };
+	
+	if (it.second) { m_videosVec.push_back(t_video); }
+#ifdef _DEBUG
+	else {
+		std::cerr << "Repeated video: \n";
+		std::cerr << *it.first->second << '\n';
+		std::cerr << *t_video << '\n';
+	}
+#endif // _DEBUG
+		
 	return *this;
 }
 

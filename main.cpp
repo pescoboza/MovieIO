@@ -3,8 +3,9 @@
 #include <stdexcept>
 
 int main(int argc, char* argv[]) {
+#ifndef _DEBUG
 	try {
-
+#endif // ! _DEBUG
 		if (argc != 2) {
 			std::cout << "Usage: " << argv[0] << " <filename>" << std::endl;
 			return 1;
@@ -20,11 +21,16 @@ int main(int argc, char* argv[]) {
 		VideoDataHolder::printVideos(videos, 0U);
 		
 	// TODO: Add main loop
+
+#ifndef _DEBUG	
 	}
 	catch (std::exception& e){
 		std::cerr << e.what() << std::endl;
+
 		return 1;
 	}
+#endif // ! _DEBUG
+
 	return 0;
 }
 
