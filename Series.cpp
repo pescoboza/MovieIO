@@ -148,11 +148,24 @@ void Episode::print(std::ostream& t_out) const{
 	const auto& sep{ s_tbl.m_separator };
 	const auto& t{ s_tbl };
 	std::string seriesNameSep{ " - " };
-	std::string seriesNameAndEpisodeName { getSeriesName()  + seriesNameSep + m_name};
+	
+	unsigned ssnNum{0U};
+	unsigned epNum{ 0U };
+	m_season.getSeries().getEpisodeSeasonAndNum(*this, ssnNum, epNum);
+
+	std::string ssnNumStr{std::to_string(ssnNum)};
+	if (ssnNumStr.size() == 1U) { ssnNumStr = '0' + ssnNumStr; }
+	ssnNumStr = 'S' + ssnNumStr;
+
+	std::string epNumStr{ std::to_string(epNum) };
+	if (epNumStr.size() == 1U) { epNumStr = '0' + epNumStr; }
+	epNumStr = 'E' + epNumStr;
+
+	std::string enrichedName { ssnNumStr + ' ' +  epNumStr + seriesNameSep + getSeriesName() +  seriesNameSep + m_name};
 
 	t_out << sep << ' ' <<
 		std::left << std::setw(t.m_id) << m_id << sep <<
-		std::left << std::setw(t.m_name) << seriesNameAndEpisodeName << sep <<
+		std::left << std::setw(t.m_name) << enrichedName << sep <<
 		std::left << std::setw(t.m_duration) << formattedDuration() << sep <<
 		std::left << std::setw(t.m_genre) << getStrFromGenre(m_genre) << sep <<
 		std::left << std::setw(t.m_rating) << std::fixed << std::setprecision(1) << getRating() << sep <<
