@@ -30,6 +30,7 @@ public:
 	const std::string& getName() const;
 	Series& addEpisode(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre, unsigned t_season, unsigned t_episodeNum);
 	Episode* getEpisode(unsigned t_season, unsigned t_episodeNum);
+	bool getEpisodeSeasonAndNum(const Episode& t_episode, unsigned& t_outSeason, unsigned& t_outEpNum) const;
 	const Episode* getEpisode(unsigned t_season, unsigned t_episodeNum) const;
 	std::vector<Season*>& getAllSeasons(std::vector<Season*>& t_outSeasons) const;
 	std::vector<Episode*>& getAllEpisodes(std::vector<Episode*>& t_outEpisodes) const;
@@ -49,6 +50,7 @@ public:
 	Series& getSeries();
 	const Series& getSeries() const;
 	Season& addEpisode(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre, unsigned t_episodeNum);
+	bool getEpisodeNum(const Episode& t_episode, unsigned& t_epNum) const;
 	std::vector<Episode*>& getAllEpisodes(std::vector<Episode*>& t_outEpisodes) const;
 	
 };
@@ -57,6 +59,7 @@ public:
 class Episode : public Video {
 	friend class Season;
 	Season& m_season;
+
 
 	Episode(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre, Season& t_season);
 	static EpisodePtr newEpisode(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre, Season& t_season);
