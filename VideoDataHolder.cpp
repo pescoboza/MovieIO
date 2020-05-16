@@ -194,9 +194,17 @@ VideosVec& VideoDataHolder::getVideos(VideosVec& t_outVideos, const std::string&
 	filter(filterFunction, m_videosVec, t_outVideos);
 	return t_outVideos;
 }
-
-VideoDataHolder& VideoDataHolder::registerVideo(Video* t_video){
 #ifdef _DEBUG
+	#include <unordered_set>
+#endif // _DEBUG
+VideoDataHolder& VideoDataHolder::registerVideo(Video* t_video){
+
+
+#ifdef _DEBUG
+	static std::unordered_set<Video*> vids;
+	if (!vids.emplace(t_video).second)	{
+		std::cerr << "POINTER REPEATED!!!\n";
+	}
 	static int count{0};
 	std::cerr << "registerVideo(): " << ++count << '\n';
 #endif // _DEBUG
