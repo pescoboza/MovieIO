@@ -75,6 +75,39 @@ void VideoDataHolder::start(){
 	input();
 
 }
+#ifdef _DEBUG
+#include <unordered_set>
+#include <unordered_map>
+#include <string>
+using EpNumSet = std::unordered_set<unsigned>;
+using SsnNumMap = std::unordered_map<unsigned, EpNumSet>;
+using  SrsMap = std::unordered_map<std::string, SsnNumMap>;
+
+namespace debug{
+
+	SrsMap series_seasons_eps;
+
+	bool is_something_repeated(SrsMap& t_map, const std::string& t_seriesName, unsigned t_ssnNum, unsigned t_epNum) {
+		auto series_it{t_map.find(t_seriesName)};
+		if (series_it == t_map.end()) {
+			t_map.emplace(
+				[&t_seriesName, &t_ssnNum, &t_epNum ]() {
+					EpNumSet ep{ t_epNum };
+					SsnNumMap ssn{ {t_ssnNum, std::move(ep)} };
+					return std::make_pair(t_seriesName, ssn);
+				}()
+			);
+			return false;
+		}
+		
+		auto& ssnSet{ series_it->second };
+		auto ssn_it{ssnSet.find(t_ssnNum)};
+		if (ssn_it == ssnSet.end())
+		
+	}
+}
+#endif // _DEBUG
+
 
 VideoDataHolder& VideoDataHolder::addEpisode(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre, const std::string& t_series, unsigned t_season, unsigned t_episodeNum, const Ratings& t_ratings) {
 	auto it{m_series.find(t_series)};
@@ -198,7 +231,6 @@ VideosVec& VideoDataHolder::getVideos(VideosVec& t_outVideos, const std::string&
 	#include <unordered_set>
 #endif // _DEBUG
 VideoDataHolder& VideoDataHolder::registerVideo(Video* t_video){
-
 
 #ifdef _DEBUG
 	static std::unordered_set<Video*> vids;
