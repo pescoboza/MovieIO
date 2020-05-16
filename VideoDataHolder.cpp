@@ -75,6 +75,7 @@ void VideoDataHolder::start(){
 	input();
 
 }
+
 #ifdef _DEBUG
 #include <unordered_set>
 #include <unordered_map>
@@ -100,16 +101,33 @@ namespace debug{
 			return false;
 		}
 		
-		auto& ssnSet{ series_it->second };
-		auto ssn_it{ssnSet.find(t_ssnNum)};
-		if (ssn_it == ssnSet.end())
-		
+		auto& ssnMap{ series_it->second };
+		auto ssn_it{ssnMap.find(t_ssnNum)};
+		if (ssn_it == ssnMap.end()) {
+			ssnMap.emplace(t_ssnNum, EpNumSet{t_epNum});
+			return false;
+		}
+
+		auto& epSet{ssn_it->second};
+		auto ep_it{epSet.find(t_epNum)};
+		if (ep_it == epSet.end()) {
+			epSet.emplace(t_epNum);
+			return false;
+		}
+		return true;
 	}
 }
 #endif // _DEBUG
 
 
 VideoDataHolder& VideoDataHolder::addEpisode(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre, const std::string& t_series, unsigned t_season, unsigned t_episodeNum, const Ratings& t_ratings) {
+#ifdef _DEBUG
+	if (debug::is_something_repeated(debug::series_seasons_eps, t_name, t_season, t_episodeNum)) {
+		std::cerr << "THE VIDEO SERIES, SEASON, AND EPISODE ARE REPEATED!!!\n";
+	}
+
+#endif // _DEBUG
+
 	auto it{m_series.find(t_series)};
 	Episode* episode{ nullptr };
 	if (it != m_series.end()) {
