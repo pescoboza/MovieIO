@@ -76,7 +76,6 @@ void VideoDataHolder::start(){
 
 }
 
-
 VideoDataHolder& VideoDataHolder::addEpisode(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre, const std::string& t_series, unsigned t_season, unsigned t_episodeNum, const Ratings& t_ratings) {
 	auto it{m_series.find(t_series)};
 	Episode* episode{ nullptr };
@@ -89,6 +88,7 @@ VideoDataHolder& VideoDataHolder::addEpisode(const std::string& t_name, const st
 		series.addEpisode(t_name,t_id, t_duration, t_genre, t_season, t_episodeNum);
 		episode = series.getEpisode(t_season, t_episodeNum);
 	}
+
 	if (!episode) {
 		throw std::runtime_error{"Could not get address of video.\n"};
 	}
@@ -196,12 +196,24 @@ VideosVec& VideoDataHolder::getVideos(VideosVec& t_outVideos, const std::string&
 }
 
 VideoDataHolder& VideoDataHolder::registerVideo(Video* t_video){
+#ifdef _DEBUG
+	static int count{0};
+	std::cerr << "registerVideo(): " << ++count << '\n';
+#endif // _DEBUG
+	
 	auto it{ m_videosById.emplace(t_video->getId(), t_video) };
 	
 	if (it.second) { m_videosVec.push_back(t_video); }
 #ifdef _DEBUG
 	else {
-		std::cerr << "Repeated video: \n";
+		bool foundInVidVec{false};
+		for (const auto& ptr : m_videosVec) {
+			if (t_video == ptr) { 
+				foundInVidVec = true; 
+				break; 
+			}
+		}
+		std::cerr << std::boolalpha << "Repeated video: " << "foundInVidVec: "<< foundInVidVec << ' ' << it.first->second << " == " << t_video << ": " <<  (it.first->second == t_video) << '\n';
 		std::cerr << *it.first->second << '\n';
 		std::cerr << *t_video << '\n';
 	}
