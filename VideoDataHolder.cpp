@@ -124,6 +124,7 @@ VideoDataHolder& VideoDataHolder::addEpisode(const std::string& t_name, const st
 #ifdef _DEBUG
 	if (debug::is_something_repeated(debug::series_seasons_eps, t_name, t_season, t_episodeNum)) {
 		std::cerr << "THE VIDEO SERIES, SEASON, AND EPISODE ARE REPEATED!!!\n";
+		std::cerr << t_series << " - S" << t_season << 'E' << t_episodeNum <<'\n';
 	}
 
 #endif // _DEBUG
@@ -249,16 +250,6 @@ VideosVec& VideoDataHolder::getVideos(VideosVec& t_outVideos, const std::string&
 	#include <unordered_set>
 #endif // _DEBUG
 VideoDataHolder& VideoDataHolder::registerVideo(Video* t_video){
-
-#ifdef _DEBUG
-	static std::unordered_set<Video*> vids;
-	if (!vids.emplace(t_video).second)	{
-		std::cerr << "POINTER REPEATED!!!\n";
-	}
-	static int count{0};
-	std::cerr << "registerVideo(): " << ++count << '\n';
-#endif // _DEBUG
-	
 	auto it{ m_videosById.emplace(t_video->getId(), t_video) };
 	
 	if (it.second) { m_videosVec.push_back(t_video); }
@@ -280,7 +271,21 @@ VideoDataHolder& VideoDataHolder::registerVideo(Video* t_video){
 	return *this;
 }
 
-VideoDataHolder& VideoDataHolder::addVideos(const std::vector<Video*>& t_videos){
-	for (auto ptr : t_videos) {	registerVideo(ptr);}
-	return *this;
+VideoDataHolder& VideoDataHolder::addVideo(VideoPtr t_video){
+	// Validate pointer
+	if (!t_video) {return *this;}
+	
+	// Validate that a video with the same id did not previously exist
+	auto idIt{ m_videosById.find(t_video->getId()) };
+	if (idIt != m_videosById.cend()) { return *this;  }
+
+	switch (t_video->getType()){
+	case VideoType::MOVIE:
+		m_movies.emplace_back(t_video);
+		m_videosVec.push_back(m_movies.back().get());
+	case VideoType::SERIES_EPISODE:
+
+	default:
+		break;
+	}
 }

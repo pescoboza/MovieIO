@@ -9,6 +9,7 @@
 #include <string>
 #include <vector>
 
+using VideoPtr  = std::unique_ptr<Video>;
 using VideosMap = std::unordered_map<std::string, Video*>; // non data-owning ptr
 using VideosVec = std::vector<Video*>; 
 using MoviePtr = std::unique_ptr<Movie>;
@@ -54,10 +55,9 @@ public:
 private:
 	static const std::string s_initMsg;
 
-
+	
 	VideoDataHolder& registerVideo(Video* t_video);
-
-	VideoDataHolder& addVideos(const std::vector<Video*>& t_videos);
+	VideoDataHolder& addVideo(VideoPtr t_video);
 
 	VideoDataHolder& addEpisode(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre, const std::string& t_series, unsigned t_season, unsigned t_episodeNum, const Ratings& t_ratings = {});
 	VideoDataHolder& addMovie(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre, const Ratings& t_ratings = {});

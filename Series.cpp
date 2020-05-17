@@ -93,10 +93,10 @@ std::vector<Video*>& Series::getAllEpisodes(std::vector<Video*>& t_outEpisodes) 
 	return t_outEpisodes;
 }
 
-Season::Season(Series& t_series) : m_series{ t_series }{}
+Season::Season(unsigned t_seasonNum, Series& t_series) : m_seasonNum{t_seasonNum}, m_series { t_series }{}
 
-SeasonPtr Season::newSeason(Series& t_series){	
-	Season s{t_series};
+SeasonPtr Season::newSeason(unsigned t_seasonNum, Series& t_series){
+	Season s{t_seasonNum,t_series};
 	return std::make_unique<Season>(std::move(s));
 }
 
@@ -110,15 +110,8 @@ Season& Season::addEpisode(const std::string& t_name, const std::string& t_id, u
 	return *this;
 }
 
-bool Season::getEpisodeNum(const Episode& t_episode, unsigned& t_epNum) const{
-	for (const auto& p : m_episodes) {
-		if (&t_episode == p.second.get()) {
-			t_epNum = p.first;
-			return true;
-		}
-	}
-	return false;
-}
+unsigned Season::getSeasonNum() const {	return m_seasonNum;}
+
 
 std::vector<Episode*>& Season::getAllEpisodes(std::vector<Episode*>& t_outEpisodes) const {
 	t_outEpisodes.reserve(t_outEpisodes.size() + m_episodes.size());
@@ -128,11 +121,11 @@ std::vector<Episode*>& Season::getAllEpisodes(std::vector<Episode*>& t_outEpisod
 	return t_outEpisodes;
 }
 
-Episode::Episode(const std::string& m_name, const std::string& t_id, unsigned t_duration, Genre t_genre, Season& t_season) :
-	Video{ m_name, t_id, t_duration, t_genre, VideoType::SERIES_EPISODE}, m_season{t_season}{}
+Episode::Episode(const std::string& m_name, const std::string& t_id, unsigned t_duration, Genre t_genre, unsigned t_episodeNum, Season& t_season) :
+	Video{ m_name, t_id, t_duration, t_genre, VideoType::SERIES_EPISODE }, m_episodeNum{t_episodeNum}, m_season{ t_season }{}
 
-EpisodePtr Episode::newEpisode(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre, Season& t_season){
-	Episode ep{ t_name, t_id, t_duration, t_genre, t_season };
+EpisodePtr Episode::newEpisode(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre, unsigned t_episodeNum, Season& t_season){
+	Episode ep{ t_name, t_id, t_duration, t_genre, t_episodeNum, t_season };
 	return std::make_unique<Episode>(std::move(ep));
 }
 
@@ -143,6 +136,8 @@ const Season& Episode::getSeason() const { return m_season; }
 const std::string& Episode::getSeriesName() const{
 	return m_season.getSeries().getName();
 }
+
+unsigned Episode::getEpisodeNum() const { return m_episodeNum;}
 
 void Episode::print(std::ostream& t_out) const{
 	const auto& sep{ s_tbl.m_separator };
