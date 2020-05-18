@@ -8,10 +8,12 @@
 #include <map>
 #include <memory>
 #include <unordered_map>
+#include <functional>
 #include <string>
 #include <vector>
 
 enum class SortVideosBy;
+enum class Actions;
 
 using VideoPtr  = std::unique_ptr<Video>;
 using VideosMap = std::unordered_map<std::string, Video*>; // non data-owning ptr
@@ -20,6 +22,36 @@ using MoviePtr = std::unique_ptr<Movie>;
 using MoviesVec = std::vector<MoviePtr>;
 using SeriesPtr = std::unique_ptr<Series>;
 using SeriesMap = std::unordered_map<std::string,SeriesPtr>;
+using ActionStrMap = std::multimap<std::string, Actions*>;
+using Actions = std::vector<Action>;
+using VideoDataHolderFunctor = void (VideoDataHolder::*)(const std::string& t_input);
+using Binding = std::function<bool>(const std::string& );
+
+class Action {
+public:
+	enum BoundAction{
+		SEARCH,
+		FILTER,
+		RATE,
+		SORT,
+		CLEAR,
+		QUIT
+	};
+
+private:
+	BoundAction m_boundAction;
+	Binding m_actionBinding;
+	Binding m_validationBinding;
+	std::string m_desc;
+	std::string m_usage;
+
+public:
+	Action( BoundAction t_boundAction, Binding& t_actionBinding, Binding& t_validationBinding, const std::string& t_desc, const std::string& t_usage);
+	bool activate(const std::string& t_input);
+	const std::string& getDesc() const;
+	const std::string& getUsage() const;
+	
+};
 
 enum class SortVideosBy {
 	NAME,
@@ -36,6 +68,10 @@ class VideoDataHolder {
 
 	MoviesVec m_movies;
 	SeriesMap m_series;
+
+
+	static const char* s_startScreen;
+	static const ActionStrMap m_actionStrings;
 
 public:
 	VideoDataHolder();
@@ -56,9 +92,6 @@ public:
 	template <typename Functor>
 	static VideosVec& filter(Functor t_filter, const VideosVec& t_inVideos, VideosVec& t_outVideos);
 	
-	template <typename Functor>
-	static VideosVec& sort(Functor t_comparator, VideosVec& t_inVideos, VideosVec& t_outVideos, bool t_descending = false);
-
 	static void printVideos(const VideosVec& t_videos, unsigned t_numEntries, bool t_printHeader = true, std::ostream& t_out = std::cout);
 
 	VideosVec& filterVideos(VideosVec& t_outVideos, const std::string& t_name = "",

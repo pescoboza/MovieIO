@@ -71,7 +71,7 @@ void VideoDataHolder::parseInfoFromFile(const std::string& t_filename){
 
 void VideoDataHolder::start(){
 	
-	std::cout << "";
+	std::cout << s_startScreen;
 	input();
 
 }
@@ -288,3 +288,20 @@ VideosVec& VideoDataHolder::sortVideosBy(const VideosVec& t_inVideos, VideosVec&
 	t_outVideos = std::move(temp);
 	return t_outVideos;
 }
+
+Action::Action(BoundAction t_boundAction, Binding& t_actionBinding, Binding& t_validationBinding, const std::string& t_desc, const std::string& t_usage) : 
+	m_parent{t_parent}, 
+	m_boundAction{t_boundAction}, 
+	m_actionBinding{t_actionBinding }, 
+	m_validationBinding{ t_valiationBinding }, 
+	m_desc{ t_desc }, 
+	m_usage{ t_usage }{}
+
+bool Action::activate(const std::string& t_input) { 
+	if (m_validationBinding(t_input)) {	return false;}
+	return activate(t_input);
+}
+
+const std::string& Action::getDesc() const { return m_desc; }
+
+const std::string& Action::getUsage() const { return m_usage; }
