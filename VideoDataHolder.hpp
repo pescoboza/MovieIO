@@ -116,6 +116,7 @@ private:
 	VideoDataHolder& addMovie(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre, const Ratings& t_ratings = {});
 
 	static std::string input(std::istream& t_in = std::cin);
+	std::pair<ActionBindings, bool> strToBinding(const std::string& t_input) const;
 };
 
 template<typename Functor>

@@ -1,6 +1,7 @@
 #include "VideoDataHolder.hpp"
-#include <fstream>
 #include <stdexcept>
+#include <fstream>
+#include <sstream>
 #include "json.hpp" // Credits to https://github.com/nlohmann/json
 
 namespace js = nlohmann;
@@ -9,14 +10,6 @@ const std::string VideoDataHolder::s_initMsg{
 R"(Usage)"
 };
 
-/*
-	SEARCH,
-	FILTER,
-	RATE,
-	SORT,
-	CLEAR,
-	QUIT
-*/
 VideoDataHolder::VideoDataHolder() : 
 	m_videosById{}, 
 	m_movies{}, 
@@ -108,7 +101,7 @@ void VideoDataHolder::start(){
 	
 	std::cout << s_startScreen;
 	input();
-
+	
 }
 
 #ifdef _DEBUG
@@ -199,6 +192,13 @@ std::string VideoDataHolder::input(std::istream& t_in){
 	std::string str{""};
 	std::getline(t_in, str);
 	return str;
+}
+
+std::pair<ActionBindings, bool> VideoDataHolder::strToBinding(const std::string& t_input) const{
+	if (t_input.empty()) { return { ActionBindings{}, false }; }
+	
+	auto firstSpacePos{t_input.find("")};
+
 }
 
 const Video* VideoDataHolder::getVideoById(const std::string& t_videoId) const{
