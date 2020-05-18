@@ -9,8 +9,43 @@ const std::string VideoDataHolder::s_initMsg{
 R"(Usage)"
 };
 
-
-VideoDataHolder::VideoDataHolder() : m_videosById{}, m_movies{}, m_series{}{}
+/*
+	SEARCH,
+	FILTER,
+	RATE,
+	SORT,
+	CLEAR,
+	QUIT
+*/
+VideoDataHolder::VideoDataHolder() : 
+	m_videosById{}, 
+	m_movies{}, 
+	m_series{}, 
+	m_actions{
+		{"search",	ActionBindings::SEARCH},
+		{"s",		ActionBindings::SEARCH},
+		{"filter",	ActionBindings::FILTER},
+		{"f",		ActionBindings::FILTER},
+		{"rate",	ActionBindings::RATE},
+		{"r",		ActionBindings::RATE},
+		{"sort",	ActionBindings::SORT},
+		{"s",		ActionBindings::SORT},
+		{"clear",	ActionBindings::CLEAR},
+		{"c",		ActionBindings::CLEAR},
+		{"quit",	ActionBindings::QUIT},
+		{"q",		ActionBindings::QUIT}},
+	m_actionBindings{[]() {
+		ActionMap bindings;
+		bindings.reserve(static_cast<unsigned>(ActionBindings::QUIT) + 1U);
+		bindings.emplace(ActionBindings::SEARCH,	std::make_unique<Action>(ActionBindings::SEARCH,"descritpion", "usage"));
+		bindings.emplace(ActionBindings::FILTER,	std::make_unique<Action>(ActionBindings::FILTER,"descritpion", "usage"));
+		bindings.emplace(ActionBindings::RATE,		std::make_unique<Action>(ActionBindings::RATE,	"descritpion", "usage"));
+		bindings.emplace(ActionBindings::SORT,		std::make_unique<Action>(ActionBindings::SORT,	"descritpion", "usage"));
+		bindings.emplace(ActionBindings::CLEAR,		std::make_unique<Action>(ActionBindings::CLEAR,	"descritpion", "usage"));
+		bindings.emplace(ActionBindings::QUIT,		std::make_unique<Action>(ActionBindings::QUIT,	"descritpion", "usage"));
+		return std::move(bindings);
+	}()}
+{}
 
 void VideoDataHolder::parseInfoFromFile(const std::string& t_filename){
 	std::ifstream file;
@@ -289,17 +324,13 @@ VideosVec& VideoDataHolder::sortVideosBy(const VideosVec& t_inVideos, VideosVec&
 	return t_outVideos;
 }
 
-Action::Action(BoundAction t_boundAction, Binding& t_actionBinding, Binding& t_validationBinding, const std::string& t_desc, const std::string& t_usage) : 
-	m_parent{t_parent}, 
-	m_boundAction{t_boundAction}, 
-	m_actionBinding{t_actionBinding }, 
-	m_validationBinding{ t_valiationBinding }, 
-	m_desc{ t_desc }, 
-	m_usage{ t_usage }{}
 
-bool Action::activate(const std::string& t_input) { 
-	if (m_validationBinding(t_input)) {	return false;}
-	return activate(t_input);
+
+Action::Action(ActionBindings t_boundAction, const std::string& t_desc, const std::string& t_usage) : 
+	m_boundAction{ t_boundAction }, m_desc{ t_desc }, m_usage{ t_usage }{}
+
+Action::ValidationResult Action::validate(const std::string& t_input){
+	// TODO: Implement this.
 }
 
 const std::string& Action::getDesc() const { return m_desc; }

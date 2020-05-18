@@ -14,6 +14,7 @@
 
 enum class SortVideosBy;
 enum class Actions;
+enum class ActionBindings;
 
 using VideoPtr  = std::unique_ptr<Video>;
 using VideosMap = std::unordered_map<std::string, Video*>; // non data-owning ptr
@@ -22,32 +23,35 @@ using MoviePtr = std::unique_ptr<Movie>;
 using MoviesVec = std::vector<MoviePtr>;
 using SeriesPtr = std::unique_ptr<Series>;
 using SeriesMap = std::unordered_map<std::string,SeriesPtr>;
-using ActionStrMap = std::multimap<std::string, Actions*>;
-using Actions = std::vector<Action>;
-using VideoDataHolderFunctor = void (VideoDataHolder::*)(const std::string& t_input);
-using Binding = std::function<bool>(const std::string& );
+using ActionStrMap = std::multimap<std::string, ActionBindings>;
+using ActionPtr = std::unique_ptr<Action>;
+using ActionMap = std::unordered_map<ActionBindings, ActionPtr>;
+
+enum class ActionBindings {
+	SEARCH,
+	FILTER,
+	RATE,
+	SORT,
+	CLEAR,
+	QUIT
+};
 
 class Action {
 public:
-	enum BoundAction{
-		SEARCH,
-		FILTER,
-		RATE,
-		SORT,
-		CLEAR,
-		QUIT
+	enum class ValidationResult {
+		INVALID_SYNTAX,
+
 	};
 
 private:
-	BoundAction m_boundAction;
-	Binding m_actionBinding;
-	Binding m_validationBinding;
+	ActionBindings m_boundAction;
 	std::string m_desc;
 	std::string m_usage;
 
 public:
-	Action( BoundAction t_boundAction, Binding& t_actionBinding, Binding& t_validationBinding, const std::string& t_desc, const std::string& t_usage);
-	bool activate(const std::string& t_input);
+	Action(ActionBindings t_boundAction, const std::string& t_desc, const std::string& t_usage);
+	ValidationResult validate(const std::string& t_input);
+
 	const std::string& getDesc() const;
 	const std::string& getUsage() const;
 	
@@ -69,9 +73,10 @@ class VideoDataHolder {
 	MoviesVec m_movies;
 	SeriesMap m_series;
 
+	ActionStrMap m_actions;
+	ActionBindings m_actionBindings;
 
 	static const char* s_startScreen;
-	static const ActionStrMap m_actionStrings;
 
 public:
 	VideoDataHolder();
