@@ -16,7 +16,7 @@ class Episode;
 using SeriesPtr = std::unique_ptr<Series>;
 
 using EpisodePtr = std::unique_ptr<Episode>;
-using Episodes = std::map<unsigned, EpisodePtr>;
+using EpisodesMap = std::map<unsigned, EpisodePtr>;
 
 using SeasonPtr = std::unique_ptr<Season>;
 using Seasons = std::map<unsigned, SeasonPtr>;
@@ -28,9 +28,8 @@ public:
 	Series(const std::string& t_name);
 	static SeriesPtr newSeries(const std::string& t_name);
 	const std::string& getName() const;
-	Series& addEpisode(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre, unsigned t_season, unsigned t_episodeNum);
+	Series& addEpisode(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre, unsigned t_seasonNum, unsigned t_episodeNum);
 	Episode* getEpisode(unsigned t_season, unsigned t_episodeNum);
-	bool getEpisodeSeasonAndNum(const Episode& t_episode, unsigned& t_outSeason, unsigned& t_outEpNum) const;
 	const Episode* getEpisode(unsigned t_season, unsigned t_episodeNum) const;
 	std::vector<Season*>& getAllSeasons(std::vector<Season*>& t_outSeasons) const;
 	std::vector<Episode*>& getAllEpisodes(std::vector<Episode*>& t_outEpisodes) const;
@@ -41,7 +40,7 @@ class Season {
 	friend class Series;
 
 	Series& m_series;
-	Episodes m_episodes;
+	EpisodesMap m_episodes;
 	unsigned m_seasonNum;
 
 	Season(unsigned t_seasonNum, Series& t_series);

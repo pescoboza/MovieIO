@@ -120,36 +120,10 @@ namespace debug{
 #endif // _DEBUG
 
 
-VideoDataHolder& VideoDataHolder::addEpisode(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre, const std::string& t_series, unsigned t_season, unsigned t_episodeNum, const Ratings& t_ratings) {
-#ifdef _DEBUG
-	if (debug::is_something_repeated(debug::series_seasons_eps, t_name, t_season, t_episodeNum)) {
-		std::cerr << "THE VIDEO SERIES, SEASON, AND EPISODE ARE REPEATED!!!\n";
-		std::cerr << t_series << " - S" << t_season << 'E' << t_episodeNum <<'\n';
-	}
-
-#endif // _DEBUG
-
-	auto it{m_series.find(t_series)};
-	Episode* episode{ nullptr };
-	if (it != m_series.end()) {
-		it->second->addEpisode(t_name, t_id, t_duration, t_genre, t_season, t_episodeNum);
-		episode = it->second->getEpisode(t_season, t_episodeNum);
-	}
-	else {
-		auto & series{*m_series.emplace(t_series, Series::newSeries(t_series)).first->second.get()};
-		series.addEpisode(t_name,t_id, t_duration, t_genre, t_season, t_episodeNum);
-		episode = series.getEpisode(t_season, t_episodeNum);
-	}
-
-	if (!episode) {
-		throw std::runtime_error{"Could not get address of video.\n"};
-	}
-
-	for (const auto r : t_ratings) {
-		episode->rate(r);
-	}
-
-	registerVideo(episode);
+VideoDataHolder& VideoDataHolder::addEpisode(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre, const std::string& t_series, unsigned t_seasonNum, unsigned t_episodeNum, const Ratings& t_ratings) {
+	auto seriesIt{ m_series.emplace(t_series, std::move(Series::newSeries(t_series))) };
+	auto &series{ *seriesIt.first->second.get() };
+	series.addEpisode(t_name, t_id, t_duration, t_genre, t_seasonNum, t_episodeNum );
 	return *this;
 }
 
@@ -245,47 +219,4 @@ VideosVec& VideoDataHolder::getVideos(VideosVec& t_outVideos, const std::string&
 
 	filter(filterFunction, m_videosVec, t_outVideos);
 	return t_outVideos;
-}
-#ifdef _DEBUG
-	#include <unordered_set>
-#endif // _DEBUG
-VideoDataHolder& VideoDataHolder::registerVideo(Video* t_video){
-	auto it{ m_videosById.emplace(t_video->getId(), t_video) };
-	
-	if (it.second) { m_videosVec.push_back(t_video); }
-#ifdef _DEBUG
-	else {
-		bool foundInVidVec{false};
-		for (const auto& ptr : m_videosVec) {
-			if (t_video == ptr) { 
-				foundInVidVec = true; 
-				break; 
-			}
-		}
-		std::cerr << std::boolalpha << "Repeated video: " << "foundInVidVec: "<< foundInVidVec << ' ' << it.first->second << " == " << t_video << ": " <<  (it.first->second == t_video) << '\n';
-		std::cerr << *it.first->second << '\n';
-		std::cerr << *t_video << '\n';
-	}
-#endif // _DEBUG
-		
-	return *this;
-}
-
-VideoDataHolder& VideoDataHolder::addVideo(VideoPtr t_video){
-	// Validate pointer
-	if (!t_video) {return *this;}
-	
-	// Validate that a video with the same id did not previously exist
-	auto idIt{ m_videosById.find(t_video->getId()) };
-	if (idIt != m_videosById.cend()) { return *this;  }
-
-	switch (t_video->getType()){
-	case VideoType::MOVIE:
-		m_movies.emplace_back(t_video);
-		m_videosVec.push_back(m_movies.back().get());
-	case VideoType::SERIES_EPISODE:
-
-	default:
-		break;
-	}
 }

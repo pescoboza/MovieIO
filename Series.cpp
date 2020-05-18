@@ -11,17 +11,9 @@ SeriesPtr Series::newSeries(const std::string& t_name){
 
 const std::string& Series::getName() const { return m_name; }
 
-Series& Series::addEpisode(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre, unsigned t_season, unsigned t_episodeNum) {
-	auto it{ m_seasons.find(t_season) };
-	Season* season{ nullptr };
-	if (it != m_seasons.end()) {
-		season = it->second.get();
-	}
-	else {
-		season = m_seasons.emplace(t_season, Season::newSeason(*this)).first->second.get();
-	}
-
-	season->addEpisode(t_name, t_id, t_duration, t_genre, t_episodeNum);
+Series& Series::addEpisode(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre, unsigned t_seasonNum, unsigned t_episodeNum) {
+	auto &season{ *m_seasons.emplace(t_seasonNum, std::move(Season::newSeason(t_seasonNum, *this))).first->second.get() };
+	season.addEpisode(t_name, t_id, t_duration, t_genre, t_episodeNum);
 	return *this;
 }
 
@@ -32,30 +24,6 @@ Episode* Series::getEpisode(unsigned t_season, unsigned t_episodeNum){
 	auto ep_it{ episodes.find(t_episodeNum)};
 	if (ep_it == episodes.end()) { return nullptr; }
 	return ep_it->second.get();
-}
-
-bool Series::getEpisodeSeasonAndNum(const Episode& t_episode, unsigned& t_outSeason, unsigned& t_outEpNum) const{
-	const auto& season{t_episode.getSeason()};
-	bool seasonFound{ false };
-	
-	unsigned seasonNum{ 0U };
-	for (const auto& p : m_seasons) {
-		if (&season == p.second.get()) {
-			seasonNum = p.first;
-			seasonFound = true;
-		}
-	}
-
-	if (!seasonFound) {	return false;}
-	
-	unsigned epNum{ 0U };
-	bool epFound{ season.getEpisodeNum(t_episode, epNum)};
-	if (epFound) {
-		t_outSeason = seasonNum;
-		t_outEpNum = epNum;
-		return true;
-	}
-	return false;
 }
 
 const Episode* Series::getEpisode(unsigned t_season, unsigned t_episodeNum) const {
@@ -97,7 +65,7 @@ Season::Season(unsigned t_seasonNum, Series& t_series) : m_seasonNum{t_seasonNum
 
 SeasonPtr Season::newSeason(unsigned t_seasonNum, Series& t_series){
 	Season s{t_seasonNum,t_series};
-	return std::make_unique<Season>(std::move(s));
+	return std::make_unique<Season>(s);
 }
 
 Series& Season::getSeries() { return m_series; }
@@ -106,7 +74,8 @@ const Series& Season::getSeries() const { return m_series; }
 
 
 Season& Season::addEpisode(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre, unsigned t_episodeNum){
-	m_episodes.emplace(t_episodeNum, Episode::newEpisode(t_name, t_id, t_duration, t_genre, *this));
+	m_episodes.emplace(t_episodeNum, EpisodesMap{});
+	m_episodes.emplace(t_episodeNum, std::move(Episode::newEpisode(t_name, t_id, t_duration, t_genre, t_episodeNum, *this)));
 	return *this;
 }
 
@@ -144,19 +113,17 @@ void Episode::print(std::ostream& t_out) const{
 	const auto& t{ s_tbl };
 	std::string seriesNameSep{ " - " };
 	
-	unsigned ssnNum{0U};
-	unsigned epNum{ 0U };
-	m_season.getSeries().getEpisodeSeasonAndNum(*this, ssnNum, epNum);
+	unsigned ssnNum{m_season.getSeasonNum()};
 
 	std::string ssnNumStr{std::to_string(ssnNum)};
 	if (ssnNumStr.size() == 1U) { ssnNumStr = '0' + ssnNumStr; }
 	ssnNumStr = 'S' + ssnNumStr;
 
-	std::string epNumStr{ std::to_string(epNum) };
-	if (epNumStr.size() == 1U) { epNumStr = '0' + epNumStr; }
-	epNumStr = 'E' + epNumStr;
+	std::string m_episodeNumStr{ std::to_string(m_episodeNum) };
+	if (m_episodeNumStr.size() == 1U) { m_episodeNumStr = '0' + m_episodeNumStr; }
+	m_episodeNumStr = 'E' + m_episodeNumStr;
 
-	std::string enrichedName { ssnNumStr + ' ' +  epNumStr + seriesNameSep + getSeriesName() +  seriesNameSep + m_name};
+	std::string enrichedName { ssnNumStr + ' ' +  m_episodeNumStr + seriesNameSep + getSeriesName() +  seriesNameSep + m_name};
 
 	t_out << sep << ' ' <<
 		std::left << std::setw(t.m_id) << m_id << sep <<
