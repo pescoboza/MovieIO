@@ -3,6 +3,8 @@
 
 #include <algorithm>
 #include <string>
+#include <sstream>
+#include <vector>
 
 namespace util {
 
@@ -21,6 +23,16 @@ namespace util {
 
 	std::string& trim(std::string& t_outStr) {
 		return ltrim(rtrim(t_outStr));
+	}
+
+	std::vector<std::string> getWords(const std::string& t_str) {
+		std::stringstream sstr{ t_str };
+		std::string buff;
+		std::vector<std::string> words;
+		while (sstr >> buff) {
+			words.emplace_back(std::move(buff));
+		}
+		return std::move(words);
 	}
 };
 

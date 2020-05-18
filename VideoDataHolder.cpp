@@ -3,6 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include "json.hpp" // Credits to https://github.com/nlohmann/json
+#include "Utilities.hpp"
 
 namespace js = nlohmann;
 
@@ -194,11 +195,14 @@ std::string VideoDataHolder::input(std::istream& t_in){
 	return str;
 }
 
-std::pair<ActionBindings, bool> VideoDataHolder::strToBinding(const std::string& t_input) const{
-	if (t_input.empty()) { return { ActionBindings{}, false }; }
-	
-	auto firstSpacePos{t_input.find("")};
-
+// auto it{ m_actions.find(words[0])};
+// std::vector<std::string> words{ util::getWords(t_input) };
+std::pair<ActionBindings, bool> VideoDataHolder::strToBinding(const std::string& t_cmdName) const{
+	auto it(m_actions.find(t_cmdName));
+	if (it != m_actions.end()) {
+		return { ActionBindings{}, false };
+	}
+	return { it->second, true };
 }
 
 const Video* VideoDataHolder::getVideoById(const std::string& t_videoId) const{
