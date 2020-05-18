@@ -7,6 +7,49 @@
 
 namespace js = nlohmann;
 
+#ifdef _DEBUG
+#include <unordered_set>
+#include <unordered_map>
+#include <string>
+using EpNumSet = std::unordered_set<unsigned>;
+using SsnNumMap = std::unordered_map<unsigned, EpNumSet>;
+using  SrsMap = std::unordered_map<std::string, SsnNumMap>;
+
+namespace debug {
+
+	SrsMap series_seasons_eps;
+
+	bool is_something_repeated(SrsMap& t_map, const std::string& t_seriesName, unsigned t_ssnNum, unsigned t_epNum) {
+		auto series_it{ t_map.find(t_seriesName) };
+		if (series_it == t_map.end()) {
+			t_map.emplace(
+				[&t_seriesName, &t_ssnNum, &t_epNum]() {
+					EpNumSet ep{ t_epNum };
+					SsnNumMap ssn{ {t_ssnNum, std::move(ep)} };
+					return std::make_pair(t_seriesName, ssn);
+				}()
+					);
+			return false;
+		}
+
+		auto& ssnMap{ series_it->second };
+		auto ssn_it{ ssnMap.find(t_ssnNum) };
+		if (ssn_it == ssnMap.end()) {
+			ssnMap.emplace(t_ssnNum, EpNumSet{ t_epNum });
+			return false;
+		}
+
+		auto& epSet{ ssn_it->second };
+		auto ep_it{ epSet.find(t_epNum) };
+		if (ep_it == epSet.end()) {
+			epSet.emplace(t_epNum);
+			return false;
+		}
+		return true;
+	}
+}
+#endif // _DEBUG
+
 const std::string VideoDataHolder::s_initMsg{
 R"(Usage)"
 };
@@ -26,6 +69,8 @@ VideoDataHolder::VideoDataHolder() :
 		{"s",		ActionBindings::SORT},
 		{"clear",	ActionBindings::CLEAR},
 		{"c",		ActionBindings::CLEAR},
+		{"help",	ActionBindings::HELP},
+		{"-h",		ActionBindings::HELP},
 		{"quit",	ActionBindings::QUIT},
 		{"q",		ActionBindings::QUIT}},
 	m_actionBindings{[]() {
@@ -36,6 +81,7 @@ VideoDataHolder::VideoDataHolder() :
 		bindings.emplace(ActionBindings::RATE,		std::make_unique<Action>(ActionBindings::RATE,	"descritpion", "usage"));
 		bindings.emplace(ActionBindings::SORT,		std::make_unique<Action>(ActionBindings::SORT,	"descritpion", "usage"));
 		bindings.emplace(ActionBindings::CLEAR,		std::make_unique<Action>(ActionBindings::CLEAR,	"descritpion", "usage"));
+		bindings.emplace(ActionBindings::HELP,		std::make_unique<Action>(ActionBindings::HELP,	"description", "usage"));
 		bindings.emplace(ActionBindings::QUIT,		std::make_unique<Action>(ActionBindings::QUIT,	"descritpion", "usage"));
 		return std::move(bindings);
 	}()}
@@ -98,55 +144,21 @@ void VideoDataHolder::parseInfoFromFile(const std::string& t_filename){
 	}
 }
 
-void VideoDataHolder::start(){
+void VideoDataHolder::start(std::ostream& t_out, std::istream& t_in){
 	
-	std::cout << s_startScreen;
-	input();
-	
-}
-
-#ifdef _DEBUG
-#include <unordered_set>
-#include <unordered_map>
-#include <string>
-using EpNumSet = std::unordered_set<unsigned>;
-using SsnNumMap = std::unordered_map<unsigned, EpNumSet>;
-using  SrsMap = std::unordered_map<std::string, SsnNumMap>;
-
-namespace debug{
-
-	SrsMap series_seasons_eps;
-
-	bool is_something_repeated(SrsMap& t_map, const std::string& t_seriesName, unsigned t_ssnNum, unsigned t_epNum) {
-		auto series_it{t_map.find(t_seriesName)};
-		if (series_it == t_map.end()) {
-			t_map.emplace(
-				[&t_seriesName, &t_ssnNum, &t_epNum ]() {
-					EpNumSet ep{ t_epNum };
-					SsnNumMap ssn{ {t_ssnNum, std::move(ep)} };
-					return std::make_pair(t_seriesName, ssn);
-				}()
-			);
-			return false;
-		}
+	while (true) {
+		t_out << s_startScreen;
 		
-		auto& ssnMap{ series_it->second };
-		auto ssn_it{ssnMap.find(t_ssnNum)};
-		if (ssn_it == ssnMap.end()) {
-			ssnMap.emplace(t_ssnNum, EpNumSet{t_epNum});
-			return false;
+		auto words{ util::getWords(input()) };
+		auto actionPair{ strToActionBinding(words[0]) };
+		
+		if (!actionPair.second) {
+			t_out << s_unkonwCommandErrMsg << std::endl;
 		}
-
-		auto& epSet{ssn_it->second};
-		auto ep_it{epSet.find(t_epNum)};
-		if (ep_it == epSet.end()) {
-			epSet.emplace(t_epNum);
-			return false;
-		}
-		return true;
 	}
 }
-#endif // _DEBUG
+
+
 
 
 void VideoDataHolder::registerVideo(Video* t_video){
@@ -195,9 +207,7 @@ std::string VideoDataHolder::input(std::istream& t_in){
 	return str;
 }
 
-// auto it{ m_actions.find(words[0])};
-// std::vector<std::string> words{ util::getWords(t_input) };
-std::pair<ActionBindings, bool> VideoDataHolder::strToBinding(const std::string& t_cmdName) const{
+std::pair<ActionBindings, bool> VideoDataHolder::strToActionBinding(const std::string& t_cmdName) const{
 	auto it(m_actions.find(t_cmdName));
 	if (it != m_actions.end()) {
 		return { ActionBindings{}, false };

@@ -33,6 +33,7 @@ enum class ActionBindings {
 	RATE,
 	SORT,
 	CLEAR,
+	HELP,
 	QUIT
 };
 
@@ -76,12 +77,14 @@ class VideoDataHolder {
 	ActionStrMap m_actions;
 	ActionBindings m_actionBindings;
 
-	static const char* s_startScreen;
+	static const std::string s_startScreen;
+	static const std::string s_unkownCmdErrMsg;
+	static const std::string s_helpMsg;
 
 public:
 	VideoDataHolder();
 	void parseInfoFromFile(const std::string& t_filename);
-	void start();
+	void start(std::ostream& t_out = std::cout, std::istream& t_in = std::cin);
 
 
 	const Video* getVideoById(const std::string& t_videoId) const; // Returns nullptr if video is not found
@@ -116,7 +119,7 @@ private:
 	VideoDataHolder& addMovie(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre, const Ratings& t_ratings = {});
 
 	static std::string input(std::istream& t_in = std::cin);
-	std::pair<ActionBindings, bool> strToBinding(const std::string& t_input) const;
+	std::pair<ActionBindings, bool> strToActionBinding(const std::string& t_input) const;
 };
 
 template<typename Functor>
