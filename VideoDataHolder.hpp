@@ -55,8 +55,7 @@ public:
 private:
 	static const std::string s_initMsg;
 
-	
-	VideoDataHolder& registerVideo(Video* t_video);
+	void registerVideo(Video* t_video);
 
 	VideoDataHolder& addEpisode(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre, const std::string& t_series, unsigned t_season, unsigned t_episodeNum, const Ratings& t_ratings = {});
 	VideoDataHolder& addMovie(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre, const Ratings& t_ratings = {});

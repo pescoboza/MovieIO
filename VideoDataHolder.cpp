@@ -119,18 +119,42 @@ namespace debug{
 }
 #endif // _DEBUG
 
+void VideoDataHolder::registerVideo(Video* t_video){
+	auto it{ m_videosById.emplace(t_video->getId(), t_video)};
+	if (!it.second) { throw std::runtime_error{ "Error registering video.\n" }; }
+	m_videosVec.push_back(it.first->second);
+}
 
 VideoDataHolder& VideoDataHolder::addEpisode(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre, const std::string& t_series, unsigned t_seasonNum, unsigned t_episodeNum, const Ratings& t_ratings) {
+	// Validate that video does not already exist
+	auto idIt{m_videosById.find(t_id)};	
+	if (idIt != m_videosById.cend()) { return *this; }
+	
 	auto seriesIt{ m_series.emplace(t_series, std::move(Series::newSeries(t_series))) };
 	auto &series{ *seriesIt.first->second.get() };
 	series.addEpisode(t_name, t_id, t_duration, t_genre, t_seasonNum, t_episodeNum );
+	
+	Video* video{ series.getEpisode(t_seasonNum, t_episodeNum) };
+	if (video == nullptr) {	throw std::runtime_error("Could not retrieve inserted video.\n");}
+
+	// Add ratings to video
+	for (const auto& r : t_ratings) { video->rate(r) ; }
+
+	registerVideo(video);
 	return *this;
 }
 
 VideoDataHolder& VideoDataHolder::addMovie(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre, const Ratings& t_ratings){
+	// Validate that video does not already exist
+	auto idIt{ m_videosById.find(t_id) };
+	if (idIt != m_videosById.cend()) { return *this; }
+	
 	m_movies.emplace_back(Movie::newMovie(t_name, t_id, t_duration, t_genre));
 	Video* movie{ m_movies.back().get() };
+
+	// Add ratings to video
 	for (const auto& r : t_ratings) {movie->rate(r);}
+	
 	registerVideo(movie);
 	return *this;
 }
