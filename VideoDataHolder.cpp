@@ -119,6 +119,7 @@ namespace debug{
 }
 #endif // _DEBUG
 
+
 void VideoDataHolder::registerVideo(Video* t_video){
 	auto it{ m_videosById.emplace(t_video->getId(), t_video)};
 	if (!it.second) { throw std::runtime_error{ "Error registering video.\n" }; }
@@ -209,7 +210,7 @@ void VideoDataHolder::printVideos(const VideosVec& t_videos, unsigned t_numEntri
 	}
 }
 
-VideosVec& VideoDataHolder::getVideos(VideosVec& t_outVideos, const std::string& t_name, const std::string& t_genre, const std::string& t_series, const std::pair<float, float>& t_rating) const{
+VideosVec& VideoDataHolder::filterVideos(VideosVec& t_outVideos, const std::string& t_name, const std::string& t_genre, const std::string& t_series, const std::pair<float, float>& t_rating) const{
 
 	auto filterFunction{ [&](const Video& t_video) {
 		
@@ -242,5 +243,46 @@ VideosVec& VideoDataHolder::getVideos(VideosVec& t_outVideos, const std::string&
 	}};
 
 	filter(filterFunction, m_videosVec, t_outVideos);
+	return t_outVideos;
+}
+
+VideosVec& VideoDataHolder::sortVideosBy(const VideosVec& t_inVideos, VideosVec& t_outVideos, SortVideosBy t_criteria){
+	t_outVideos.clear();
+	t_outVideos.reserve(t_inVideos.size());
+	
+
+	switch (t_criteria)	{
+	case SortVideosBy::NAME: 
+	{
+		std::multimap<std::string, Video*> videos;
+		for (const auto& v : t_inVideos) { videos.emplace(v->getName(), v); }
+		for (const auto& p : videos) { t_outVideos.push_back(p.second); }
+	}
+		break;
+	case SortVideosBy::ID:
+	{
+		std::multimap<std::string, Video*> videos;
+		for (const auto& v : t_inVideos) { videos.emplace(v->getId(), v); }
+		for (const auto& p : videos) { t_outVideos.push_back(p.second); }
+	}
+		break;
+	case SortVideosBy::RATING:
+	{
+		std::multimap<float, Video*> videos;
+		for (const auto& v : t_inVideos) { videos.emplace(v->getRating(), v); }
+		for (const auto& p : videos) { t_outVideos.push_back(p.second); }
+	}
+		break;
+	case SortVideosBy::LENGTH:
+	{
+		std::multimap<int, Video*> videos;
+		for (const auto& v : t_inVideos) { videos.emplace(v->getDuration(), v); }
+		for (const auto& p : videos) { t_outVideos.push_back(p.second); }
+	}
+		break;
+	default:
+		break;
+	}
+
 	return t_outVideos;
 }

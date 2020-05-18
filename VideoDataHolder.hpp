@@ -5,10 +5,13 @@
 #include "Movie.hpp"
 #include "Series.hpp"
 #include <algorithm>
+#include <map>
 #include <memory>
 #include <unordered_map>
 #include <string>
 #include <vector>
+
+enum class SortVideosBy;
 
 using VideoPtr  = std::unique_ptr<Video>;
 using VideosMap = std::unordered_map<std::string, Video*>; // non data-owning ptr
@@ -17,6 +20,14 @@ using MoviePtr = std::unique_ptr<Movie>;
 using MoviesVec = std::vector<MoviePtr>;
 using SeriesPtr = std::unique_ptr<Series>;
 using SeriesMap = std::unordered_map<std::string,SeriesPtr>;
+
+enum class SortVideosBy {
+	NAME,
+	ID,
+	RATING,
+	LENGTH
+};
+
 
 class VideoDataHolder {
 	
@@ -50,11 +61,13 @@ public:
 
 	static void printVideos(const VideosVec& t_videos, unsigned t_numEntries, bool t_printHeader = true, std::ostream& t_out = std::cout);
 
-	VideosVec& getVideos(VideosVec& t_outVideos, const std::string& t_name = "",
+	VideosVec& filterVideos(VideosVec& t_outVideos, const std::string& t_name = "",
 		const std::string& t_genre = "",
 		const std::string& t_series = "",
 		const std::pair<float, float>& t_rating = {Video::s_minRating, Video::s_maxRating}) const;
 
+	
+	static VideosVec& sortVideosBy(const VideosVec& t_inVideos, VideosVec& t_outVideos, SortVideosBy t_criteria);
 
 private:
 	static const std::string s_initMsg;
@@ -78,26 +91,5 @@ inline VideosVec& VideoDataHolder::filter(Functor t_filter, const VideosVec& t_i
 	return t_outVideos;
 }
 
-template<typename Functor>
-inline VideosVec& VideoDataHolder::sort(Functor t_comparator, VideosVec& t_inVideos, VideosVec& t_outVideos, bool t_descending){
-	t_outVideos.clear();
-	unsigned numVids{t_inVideos.size()};
-	t_outVideos.reserve(numVids);
-	for (const auto& p : t_inVideos) {t_outVideos.push_back(p);}
-
-	for (unsigned i{0U};i < numVids;i++) {
-		for (unsigned j{ 0U }; j < numVids; j++) {
-			if (t_comparator(t_outVideos[i], t_outVideos[j])) {
-				std::swap(t_outVideos[i], t_outVideos[j]);
-			}
-		}
-	}
-
-	if (t_descending) {	
-		std::reverse(t_outVideos.begin(), t_outVideos.end());
-	}
-
-	return t_outVideos;
-}
 
 #endif // !VIDEO_DATA_HOLDER_HPP
