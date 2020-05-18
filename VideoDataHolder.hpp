@@ -4,6 +4,7 @@
 #include "Video.hpp"
 #include "Movie.hpp"
 #include "Series.hpp"
+#include <algorithm>
 #include <memory>
 #include <unordered_map>
 #include <string>
@@ -42,8 +43,11 @@ public:
 
 	// Returns all the video entries that match the filter function
 	template <typename Functor>
-	static VideosVec& filter(Functor t_filter, VideosVec t_inVideos, VideosVec& t_outVideos);
+	static VideosVec& filter(Functor t_filter, const VideosVec& t_inVideos, VideosVec& t_outVideos);
 	
+	template <typename Functor>
+	static VideosVec& sort(Functor t_comparator, VideosVec& t_inVideos, VideosVec& t_outVideos, bool t_descending = false);
+
 	static void printVideos(const VideosVec& t_videos, unsigned t_numEntries, bool t_printHeader = true, std::ostream& t_out = std::cout);
 
 	VideosVec& getVideos(VideosVec& t_outVideos, const std::string& t_name = "",
@@ -64,13 +68,35 @@ private:
 };
 
 template<typename Functor>
-inline VideosVec& VideoDataHolder::filter(Functor t_filter, VideosVec t_inVideos, VideosVec& t_outVideos){
+inline VideosVec& VideoDataHolder::filter(Functor t_filter, const VideosVec& t_inVideos, VideosVec& t_outVideos){
 	for (const auto vidPtr : t_inVideos) {
 		const auto& constVid = *vidPtr;
 		if (t_filter(constVid)) {
 			t_outVideos.push_back(vidPtr);
 		}
 	}
+	return t_outVideos;
+}
+
+template<typename Functor>
+inline VideosVec& VideoDataHolder::sort(Functor t_comparator, VideosVec& t_inVideos, VideosVec& t_outVideos, bool t_descending){
+	t_outVideos.clear();
+	unsigned numVids{t_inVideos.size()};
+	t_outVideos.reserve(numVids);
+	for (const auto& p : t_inVideos) {t_outVideos.push_back(p);}
+
+	for (unsigned i{0U};i < numVids;i++) {
+		for (unsigned j{ 0U }; j < numVids; j++) {
+			if (t_comparator(t_outVideos[i], t_outVideos[j])) {
+				std::swap(t_outVideos[i], t_outVideos[j]);
+			}
+		}
+	}
+
+	if (t_descending) {	
+		std::reverse(t_outVideos.begin(), t_outVideos.end());
+	}
+
 	return t_outVideos;
 }
 
