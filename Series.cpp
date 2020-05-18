@@ -11,11 +11,13 @@ SeriesPtr Series::newSeries(const std::string& t_name){
 
 const std::string& Series::getName() const { return m_name; }
 
+
 Series& Series::addEpisode(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre, unsigned t_seasonNum, unsigned t_episodeNum) {
 	auto &season{ *m_seasons.emplace(t_seasonNum, std::move(Season::newSeason(t_seasonNum, *this))).first->second.get() };
 	season.addEpisode(t_name, t_id, t_duration, t_genre, t_episodeNum);
 	return *this;
 }
+
 
 Episode* Series::getEpisode(unsigned t_season, unsigned t_episodeNum){
 	auto ssn_it{ m_seasons.find(t_season) };
@@ -26,6 +28,7 @@ Episode* Series::getEpisode(unsigned t_season, unsigned t_episodeNum){
 	return ep_it->second.get();
 }
 
+// MOT THIS ONE
 const Episode* Series::getEpisode(unsigned t_season, unsigned t_episodeNum) const {
 	auto ssn_it{ m_seasons.find(t_season) };
 	if (ssn_it == m_seasons.cend()) { return nullptr; }
@@ -35,6 +38,7 @@ const Episode* Series::getEpisode(unsigned t_season, unsigned t_episodeNum) cons
 	return ep_it->second.get();
 }
 
+// MOT THIS ONE
 std::vector<Season*>& Series::getAllSeasons(std::vector<Season*>& t_outSeasons) const{
 	t_outSeasons.reserve(t_outSeasons.size() + m_seasons.size());
 	for (const auto& ssnPair : m_seasons) {
@@ -43,6 +47,7 @@ std::vector<Season*>& Series::getAllSeasons(std::vector<Season*>& t_outSeasons) 
 	return t_outSeasons;
 }
 
+// MOT THIS ONE
 std::vector<Episode*>& Series::getAllEpisodes(std::vector<Episode*>& t_outEpisodes) const{
 	for (const auto& ssnPair : m_seasons) {
 		ssnPair.second->getAllEpisodes(t_outEpisodes);
@@ -50,6 +55,7 @@ std::vector<Episode*>& Series::getAllEpisodes(std::vector<Episode*>& t_outEpisod
 	return t_outEpisodes;
 }
 
+// MOT THIS ONE
 std::vector<Video*>& Series::getAllEpisodes(std::vector<Video*>& t_outEpisodes) const {
 	for (const auto& ssnPair : m_seasons) {
 		std::vector<Video*> videos;
@@ -65,7 +71,7 @@ Season::Season(unsigned t_seasonNum, Series& t_series) : m_seasonNum{t_seasonNum
 
 SeasonPtr Season::newSeason(unsigned t_seasonNum, Series& t_series){
 	Season s{t_seasonNum,t_series};
-	return std::make_unique<Season>(s);
+	return std::make_unique<Season>(std::move(s));
 }
 
 Series& Season::getSeries() { return m_series; }
@@ -73,8 +79,8 @@ Series& Season::getSeries() { return m_series; }
 const Series& Season::getSeries() const { return m_series; }
 
 
+
 Season& Season::addEpisode(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre, unsigned t_episodeNum){
-	m_episodes.emplace(t_episodeNum, EpisodesMap{});
 	m_episodes.emplace(t_episodeNum, std::move(Episode::newEpisode(t_name, t_id, t_duration, t_genre, t_episodeNum, *this)));
 	return *this;
 }
@@ -93,6 +99,7 @@ std::vector<Episode*>& Season::getAllEpisodes(std::vector<Episode*>& t_outEpisod
 Episode::Episode(const std::string& m_name, const std::string& t_id, unsigned t_duration, Genre t_genre, unsigned t_episodeNum, Season& t_season) :
 	Video{ m_name, t_id, t_duration, t_genre, VideoType::SERIES_EPISODE }, m_episodeNum{t_episodeNum}, m_season{ t_season }{}
 
+// MOT THIS ONE
 EpisodePtr Episode::newEpisode(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre, unsigned t_episodeNum, Season& t_season){
 	Episode ep{ t_name, t_id, t_duration, t_genre, t_episodeNum, t_season };
 	return std::make_unique<Episode>(std::move(ep));
@@ -108,6 +115,7 @@ const std::string& Episode::getSeriesName() const{
 
 unsigned Episode::getEpisodeNum() const { return m_episodeNum;}
 
+// MOT THIS ONE
 void Episode::print(std::ostream& t_out) const{
 	const auto& sep{ s_tbl.m_separator };
 	const auto& t{ s_tbl };
@@ -134,6 +142,8 @@ void Episode::print(std::ostream& t_out) const{
 		std::left << std::setw(t.m_type) << getStrFromVideoType(m_type) << sep;
 }
 
+
+// MOT THIS ONE
 std::ostream& operator<<(std::ostream& t_out, const Episode& t_episode){
 	t_episode.print(t_out);
 	return t_out;
