@@ -67,7 +67,7 @@ public:
 		const std::pair<float, float>& t_rating = {Video::s_minRating, Video::s_maxRating}) const;
 
 	
-	static VideosVec& sortVideosBy(const VideosVec& t_inVideos, VideosVec& t_outVideos, SortVideosBy t_criteria);
+	static VideosVec& sortVideosBy(const VideosVec& t_inVideos, VideosVec& t_outVideos, SortVideosBy t_criteria, bool t_ascending = true);
 
 private:
 	static const std::string s_initMsg;

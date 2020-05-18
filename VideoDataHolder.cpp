@@ -246,43 +246,45 @@ VideosVec& VideoDataHolder::filterVideos(VideosVec& t_outVideos, const std::stri
 	return t_outVideos;
 }
 
-VideosVec& VideoDataHolder::sortVideosBy(const VideosVec& t_inVideos, VideosVec& t_outVideos, SortVideosBy t_criteria){
-	t_outVideos.clear();
-	t_outVideos.reserve(t_inVideos.size());
-	
+VideosVec& VideoDataHolder::sortVideosBy(const VideosVec& t_inVideos, VideosVec& t_outVideos, SortVideosBy t_criteria, bool t_ascending){
+	VideosVec temp;
+	temp.reserve(t_inVideos.size());
 
 	switch (t_criteria)	{
 	case SortVideosBy::NAME: 
 	{
 		std::multimap<std::string, Video*> videos;
 		for (const auto& v : t_inVideos) { videos.emplace(v->getName(), v); }
-		for (const auto& p : videos) { t_outVideos.push_back(p.second); }
+		for (const auto& p : videos) { temp.push_back(p.second); }
 	}
 		break;
 	case SortVideosBy::ID:
 	{
 		std::multimap<std::string, Video*> videos;
 		for (const auto& v : t_inVideos) { videos.emplace(v->getId(), v); }
-		for (const auto& p : videos) { t_outVideos.push_back(p.second); }
+		for (const auto& p : videos) { temp.push_back(p.second); }
 	}
 		break;
 	case SortVideosBy::RATING:
 	{
 		std::multimap<float, Video*> videos;
 		for (const auto& v : t_inVideos) { videos.emplace(v->getRating(), v); }
-		for (const auto& p : videos) { t_outVideos.push_back(p.second); }
+		for (const auto& p : videos) { temp.push_back(p.second); }
 	}
 		break;
 	case SortVideosBy::LENGTH:
 	{
 		std::multimap<int, Video*> videos;
 		for (const auto& v : t_inVideos) { videos.emplace(v->getDuration(), v); }
-		for (const auto& p : videos) { t_outVideos.push_back(p.second); }
+		for (const auto& p : videos) { temp.push_back(p.second); }
 	}
 		break;
 	default:
 		break;
 	}
 
+	if (t_ascending) { std::reverse(temp.begin(), temp.end()); }
+
+	t_outVideos = std::move(temp);
 	return t_outVideos;
 }
