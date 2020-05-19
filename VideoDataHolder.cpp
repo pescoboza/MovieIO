@@ -64,8 +64,6 @@ VideoDataHolder::VideoDataHolder() :
 	m_actions{
 		{"search",	ActionBindings::SEARCH},
 		{"s",		ActionBindings::SEARCH},
-		{"filter",	ActionBindings::FILTER},
-		{"f",		ActionBindings::FILTER},
 		{"rate",	ActionBindings::RATE},
 		{"r",		ActionBindings::RATE},
 		{"sort",	ActionBindings::SORT},
@@ -80,7 +78,6 @@ VideoDataHolder::VideoDataHolder() :
 		ActionMap bindings;
 		bindings.reserve(static_cast<unsigned>(ActionBindings::QUIT) + 1U);
 		bindings.emplace(ActionBindings::SEARCH,	std::make_unique<Action>(ActionBindings::SEARCH,"descritpion", "search <id> <name> <duration> <>"));
-		bindings.emplace(ActionBindings::FILTER,	std::make_unique<Action>(ActionBindings::FILTER,"descritpion", "usage"));
 		bindings.emplace(ActionBindings::RATE,		std::make_unique<Action>(ActionBindings::RATE,	"Add a rating to a video.", "rate <id> <rating>"));
 		bindings.emplace(ActionBindings::SORT,		std::make_unique<Action>(ActionBindings::SORT,	"descritpion", "sort <category>"));
 		bindings.emplace(ActionBindings::CLEAR,		std::make_unique<Action>(ActionBindings::CLEAR,	"descritpion", "usage"));
@@ -88,17 +85,38 @@ VideoDataHolder::VideoDataHolder() :
 		bindings.emplace(ActionBindings::QUIT,		std::make_unique<Action>(ActionBindings::QUIT,	"descritpion", "usage"));
 		return std::move(bindings);
 	}()},
-	m_cmdParams{ []() {
+	m_cmds{ []() {
+		CmdsMap cmds;
+
 		CmdParamsMap params;
-		params.emplace("name",		std::make_pair(ActionBindings::SEARCH, 1U));	// name
-		params.emplace("id",		std::make_pair(ActionBindings::SEARCH, 1U));	// id
-		params.emplace("rmin",		std::make_pair(ActionBindings::SEARCH, 1U));	// min rating
-		params.emplace("rmax",		std::make_pair(ActionBindings::SEARCH, 1U));	// max rating
-		params.emplace("dmin",		std::make_pair(ActionBindings::SEARCH, 1U));	// min duration
-		params.emplace("dmax",		std::make_pair(ActionBindings::SEARCH, 1U));	// max duration
-		params.emplace("genre",		std::make_pair(ActionBindings::SEARCH, 1U));	// genre
-		params.emplace("series",	std::make_pair(ActionBindings::SEARCH, 1U));	// series
-		return std::move(params);
+
+		// Search
+		params.emplace("name",			1U);
+		params.emplace("id",			1U);
+		params.emplace("minrating",		1U);
+		params.emplace("maxrating",		1U);
+		params.emplace("minduration",	1U);
+		params.emplace("maxduration",	1U);
+		params.emplace("series",		1U);
+
+		cmds.emplace(ActionBindings::SEARCH, std::move(params));
+		params.clear();
+
+		// Sort
+		params.emplace("name+",		1U);
+		params.emplace("name-",		1U);
+		params.emplace("rating+",	1U);
+		params.emplace("rating-",	1U);
+		params.emplace("series",	1U);
+
+		cmds.emplace(ActionBindings::SORT, std::move(params));
+		params.clear();
+
+		params.emplace("rate", 2U);
+		cmds.emplace(ActionBindings::RATE, std::move(params));
+
+
+		return std::move(cmds);
 	}() }
 {}
 
@@ -174,10 +192,11 @@ void VideoDataHolder::start(std::ostream& t_out, std::istream& t_in){
 
 		switch (actionPair.first){
 		case ActionBindings::SEARCH:
-			break;
-		case ActionBindings::FILTER:
+			
+			
 			break;
 		case ActionBindings::RATE:
+		
 			break;
 		case ActionBindings::SORT:
 			break;

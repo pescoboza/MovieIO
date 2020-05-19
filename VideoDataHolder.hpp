@@ -27,20 +27,21 @@ using SeriesMap = std::unordered_map<std::string,SeriesPtr>;
 using ActionStrMap = std::multimap<std::string, ActionBindings>;
 using ActionPtr = std::unique_ptr<Action>;
 using ActionMap = std::unordered_map<ActionBindings, ActionPtr>;
-using CmdParamsMap = std::unordered_map<std::string, std::pair<ActionBindings, unsigned>>;
+using NumArgs = unsigned;
+using CmdParamsMap = std::unordered_map<std::string, NumArgs>;
+using CmdsMap = std::unordered_map<ActionBindings, CmdParamsMap>;
 
 
 enum class SearchCategories {
 	NAME,
 	ID,
 	RATING,
-	LENGTH,
+	DURATION,
 	SERIES
 };
 
 enum class ActionBindings {
 	SEARCH,
-	FILTER,
 	RATE,
 	SORT,
 	CLEAR,
@@ -80,7 +81,7 @@ class VideoDataHolder {
 
 	ActionStrMap m_actions;
 	ActionMap m_actionBindings;
-	CmdParamsMap m_cmdParams;
+	CmdsMap m_cmds;
 
 	static const std::string s_startScreen;
 	static const std::string s_unkownCmdErrMsg;
