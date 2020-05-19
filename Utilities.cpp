@@ -19,17 +19,28 @@ namespace utl {
 		return ltrim(rtrim(t_outStr));
 	}
 
-	std::vector<std::string> getWords(const std::string& t_str) {
+	std::vector<std::string> getWords(const std::string& t_str, bool t_respectQuoted) {
 		std::stringstream sstr{ t_str };
 		std::string buff;
 		std::vector<std::string> words;
-		while (sstr >> std::quoted(buff)) {
-			words.emplace_back(std::move(buff));
+
+		if (t_respectQuoted) {
+			while (sstr >> std::quoted(buff)) {
+				words.emplace_back(std::move(buff));
+			}		
+		}
+		else {
+			while (sstr >> buff) {
+				words.emplace_back(std::move(buff));
+			}
 		}
 		return std::move(words);
 	}
 
-	bool getNWordsAfterKeyword(const std::vector<std::string>& t_words, std::vector<const std::string*>& t_outWords, const std::string& t_keyword, unsigned t_n) {
+	bool getNWordsAfterKeyword(const std::vector<std::string>& t_words, 
+								std::vector<const std::string*>& t_outWords, 
+								const std::string& t_keyword, 
+								unsigned t_n) {
 
 		unsigned i{ 0U };
 		auto size{ t_words.size() };

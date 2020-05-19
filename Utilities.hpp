@@ -16,7 +16,7 @@ namespace utl {
 
 	std::string& trim(std::string& t_outStr);
 
-	std::vector<std::string> getWords(const std::string& t_str);
+	std::vector<std::string> getWords(const std::string& t_str, bool t_respectQuoted = true);
 
 	bool getNWordsAfterKeyword(const std::vector<std::string>& t_words,
 		std::vector<const std::string*>& t_outWords,

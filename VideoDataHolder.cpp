@@ -87,7 +87,19 @@ VideoDataHolder::VideoDataHolder() :
 		bindings.emplace(ActionBindings::HELP,		std::make_unique<Action>(ActionBindings::HELP,	"description", "usage"));
 		bindings.emplace(ActionBindings::QUIT,		std::make_unique<Action>(ActionBindings::QUIT,	"descritpion", "usage"));
 		return std::move(bindings);
-	}()}
+	}()},
+	m_cmdParams{ []() {
+		CmdParamsMap params;
+		params.emplace("name",		std::make_pair(ActionBindings::SEARCH, 1U));	// name
+		params.emplace("id",		std::make_pair(ActionBindings::SEARCH, 1U));	// id
+		params.emplace("rmin",		std::make_pair(ActionBindings::SEARCH, 1U));	// min rating
+		params.emplace("rmax",		std::make_pair(ActionBindings::SEARCH, 1U));	// max rating
+		params.emplace("dmin",		std::make_pair(ActionBindings::SEARCH, 1U));	// min duration
+		params.emplace("dmax",		std::make_pair(ActionBindings::SEARCH, 1U));	// max duration
+		params.emplace("genre",		std::make_pair(ActionBindings::SEARCH, 1U));	// genre
+		params.emplace("series",	std::make_pair(ActionBindings::SEARCH, 1U));	// series
+		return std::move(params);
+	}() }
 {}
 
 void VideoDataHolder::parseInfoFromFile(const std::string& t_filename){
@@ -182,9 +194,6 @@ void VideoDataHolder::start(std::ostream& t_out, std::istream& t_in){
 
 	}
 }
-
-
-
 
 void VideoDataHolder::registerVideo(Video* t_video){
 	auto it{ m_videosById.emplace(t_video->getId(), t_video)};

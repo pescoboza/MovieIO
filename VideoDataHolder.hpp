@@ -27,6 +27,8 @@ using SeriesMap = std::unordered_map<std::string,SeriesPtr>;
 using ActionStrMap = std::multimap<std::string, ActionBindings>;
 using ActionPtr = std::unique_ptr<Action>;
 using ActionMap = std::unordered_map<ActionBindings, ActionPtr>;
+using CmdParamsMap = std::unordered_map<std::string, std::pair<ActionBindings, unsigned>>;
+
 
 enum class SearchCategories {
 	NAME,
@@ -78,6 +80,7 @@ class VideoDataHolder {
 
 	ActionStrMap m_actions;
 	ActionMap m_actionBindings;
+	CmdParamsMap m_cmdParams;
 
 	static const std::string s_startScreen;
 	static const std::string s_unkownCmdErrMsg;
