@@ -22,6 +22,7 @@
     <ClInclude Include="json.hpp" />
     <ClInclude Include="Movie.hpp" />
     <ClInclude Include="Series.hpp" />
+    <ClInclude Include="Utilities.hpp" />
     <ClInclude Include="Video.hpp" />
     <ClInclude Include="VideoDataHolder.hpp" />
   </ItemGroup>
@@ -29,6 +30,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Movie.cpp" />
     <ClCompile Include="Series.cpp" />
+    <ClCompile Include="Utilities.cpp" />
     <ClCompile Include="Video.cpp" />
     <ClCompile Include="VideoDataHolder.cpp" />
   </ItemGroup>

@@ -12,6 +12,7 @@
 #include <string>
 #include <vector>
 
+class Action;
 enum class SortVideosBy;
 enum class Actions;
 enum class ActionBindings;
@@ -27,6 +28,14 @@ using ActionStrMap = std::multimap<std::string, ActionBindings>;
 using ActionPtr = std::unique_ptr<Action>;
 using ActionMap = std::unordered_map<ActionBindings, ActionPtr>;
 
+enum class SearchCategories {
+	NAME,
+	ID,
+	RATING,
+	LENGTH,
+	SERIES
+};
+
 enum class ActionBindings {
 	SEARCH,
 	FILTER,
@@ -38,20 +47,13 @@ enum class ActionBindings {
 };
 
 class Action {
-public:
-	enum class ValidationResult {
-		INVALID_SYNTAX,
 
-	};
-
-private:
 	ActionBindings m_boundAction;
 	std::string m_desc;
 	std::string m_usage;
 
 public:
 	Action(ActionBindings t_boundAction, const std::string& t_desc, const std::string& t_usage);
-	ValidationResult validate(const std::string& t_input);
 
 	const std::string& getDesc() const;
 	const std::string& getUsage() const;
@@ -75,7 +77,7 @@ class VideoDataHolder {
 	SeriesMap m_series;
 
 	ActionStrMap m_actions;
-	ActionBindings m_actionBindings;
+	ActionMap m_actionBindings;
 
 	static const std::string s_startScreen;
 	static const std::string s_unkownCmdErrMsg;

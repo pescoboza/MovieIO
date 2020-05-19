@@ -54,6 +54,9 @@ const std::string VideoDataHolder::s_initMsg{
 R"(Usage)"
 };
 
+const std::string VideoDataHolder::s_unkownCmdErrMsg{ "Err" };
+const std::string VideoDataHolder::s_startScreen{ "SC" };
+
 VideoDataHolder::VideoDataHolder() : 
 	m_videosById{}, 
 	m_movies{}, 
@@ -76,10 +79,10 @@ VideoDataHolder::VideoDataHolder() :
 	m_actionBindings{[]() {
 		ActionMap bindings;
 		bindings.reserve(static_cast<unsigned>(ActionBindings::QUIT) + 1U);
-		bindings.emplace(ActionBindings::SEARCH,	std::make_unique<Action>(ActionBindings::SEARCH,"descritpion", "usage"));
+		bindings.emplace(ActionBindings::SEARCH,	std::make_unique<Action>(ActionBindings::SEARCH,"descritpion", "search <id> <name> <duration> <>"));
 		bindings.emplace(ActionBindings::FILTER,	std::make_unique<Action>(ActionBindings::FILTER,"descritpion", "usage"));
-		bindings.emplace(ActionBindings::RATE,		std::make_unique<Action>(ActionBindings::RATE,	"descritpion", "usage"));
-		bindings.emplace(ActionBindings::SORT,		std::make_unique<Action>(ActionBindings::SORT,	"descritpion", "usage"));
+		bindings.emplace(ActionBindings::RATE,		std::make_unique<Action>(ActionBindings::RATE,	"Add a rating to a video.", "rate <id> <rating>"));
+		bindings.emplace(ActionBindings::SORT,		std::make_unique<Action>(ActionBindings::SORT,	"descritpion", "sort <category>"));
 		bindings.emplace(ActionBindings::CLEAR,		std::make_unique<Action>(ActionBindings::CLEAR,	"descritpion", "usage"));
 		bindings.emplace(ActionBindings::HELP,		std::make_unique<Action>(ActionBindings::HELP,	"description", "usage"));
 		bindings.emplace(ActionBindings::QUIT,		std::make_unique<Action>(ActionBindings::QUIT,	"descritpion", "usage"));
@@ -145,16 +148,38 @@ void VideoDataHolder::parseInfoFromFile(const std::string& t_filename){
 }
 
 void VideoDataHolder::start(std::ostream& t_out, std::istream& t_in){
-	
-	while (true) {
+	bool isQuit{ false };
+	while (!isQuit) {
 		t_out << s_startScreen;
 		
-		auto words{ util::getWords(input()) };
+		auto words{ utl::getWords(input()) };
 		auto actionPair{ strToActionBinding(words[0]) };
 		
 		if (!actionPair.second) {
-			t_out << s_unkonwCommandErrMsg << std::endl;
+			t_out << s_unkownCmdErrMsg << std::endl;
+			continue;
 		}
+
+		switch (actionPair.first){
+		case ActionBindings::SEARCH:
+			break;
+		case ActionBindings::FILTER:
+			break;
+		case ActionBindings::RATE:
+			break;
+		case ActionBindings::SORT:
+			break;
+		case ActionBindings::CLEAR:
+			break;
+		case ActionBindings::HELP:
+			break; 
+		case ActionBindings::QUIT:
+			isQuit = true;
+			break;
+		default:
+			break;
+		}
+
 	}
 }
 
@@ -343,9 +368,6 @@ VideosVec& VideoDataHolder::sortVideosBy(const VideosVec& t_inVideos, VideosVec&
 Action::Action(ActionBindings t_boundAction, const std::string& t_desc, const std::string& t_usage) : 
 	m_boundAction{ t_boundAction }, m_desc{ t_desc }, m_usage{ t_usage }{}
 
-Action::ValidationResult Action::validate(const std::string& t_input){
-	// TODO: Implement this.
-}
 
 const std::string& Action::getDesc() const { return m_desc; }
 
