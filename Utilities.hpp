@@ -2,6 +2,8 @@
 #define UTILITIES_HPP
 
 #include <algorithm>
+#include <iomanip>
+#include <iostream>
 #include <string>
 #include <sstream>
 #include <vector>

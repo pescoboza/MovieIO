@@ -23,7 +23,7 @@ namespace utl {
 		std::stringstream sstr{ t_str };
 		std::string buff;
 		std::vector<std::string> words;
-		while (sstr >> buff) {
+		while (sstr >> std::quoted(buff)) {
 			words.emplace_back(std::move(buff));
 		}
 		return std::move(words);
