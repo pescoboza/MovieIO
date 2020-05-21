@@ -1,11 +1,15 @@
 #include "VideoDataHolder.hpp"
 #include <stdexcept>
 #include <fstream>
+#include <functional>
 #include <sstream>
 #include "json.hpp" // Credits to https://github.com/nlohmann/json
 #include "Utilities.hpp"
 
 namespace js = nlohmann;
+
+using PtrToConstStrVec = std::vector<const std::string*>;
+using CmdParamsMemo = std::unordered_map<std::reference_wrapper<std::string>,PtrToConstStrVec>;
 
 #ifdef _DEBUG
 #include <unordered_set>
@@ -14,6 +18,7 @@ namespace js = nlohmann;
 using EpNumSet = std::unordered_set<unsigned>;
 using SsnNumMap = std::unordered_map<unsigned, EpNumSet>;
 using  SrsMap = std::unordered_map<std::string, SsnNumMap>;
+
 
 namespace debug {
 
@@ -196,6 +201,9 @@ void VideoDataHolder::start(std::ostream& t_out, std::istream& t_in){
 		auto action = actionPair.first;
 		auto cmdIt{ m_cmds.find(action) };
 
+		// Store the parameter and its arguments
+		CmdParamsMemo paramsMemo;
+
 		// If the command exists, but its not in the map, it means it does not need any additional parameters
 		if (cmdIt != m_cmds.cend()) {
 			auto& paramsMap{cmdIt->second};
@@ -214,40 +222,45 @@ void VideoDataHolder::start(std::ostream& t_out, std::istream& t_in){
 					break;
 				}
 
-				// Capture the number of args needed for the keyword
-				std::vector<const std::string*> paramArgs;
+				// Remember the new emplaced parameter
+				auto& paramArgs{ paramsMemo.emplace(*it, PtrToConstStrVec{}).first->second};
 				paramArgs.reserve(keywordIt->second);
+				
+				// Capture the number of args needed for the keyword
 				for (unsigned i{ 0 }; i < keywordIt->second; i++) {
 					it++;
 					paramArgs.push_back(&*it);
 				}
-				// TODO: Figu
+
+				// Go to the next keyword
 				it++;
 			}
-
-
 		}
 
-		switch (actionPair.first){
+
+		// We have collected the keywords and parameters for the command
+		// We now pass them to the callback assigned to the command function
+
+		switch (action)
+		{
 		case ActionBindings::SEARCH:
-			
-			
 			break;
 		case ActionBindings::RATE:
-		
 			break;
 		case ActionBindings::SORT:
 			break;
 		case ActionBindings::CLEAR:
 			break;
 		case ActionBindings::HELP:
-			break; 
+			break;
 		case ActionBindings::QUIT:
-			isQuit = true;
 			break;
 		default:
 			break;
 		}
+
+		m_actionBindings
+		paramsMemo
 
 	}
 }
@@ -304,6 +317,10 @@ std::pair<ActionBindings, bool> VideoDataHolder::strToActionBinding(const std::s
 		return { ActionBindings{}, false };
 	}
 	return { it->second, true };
+}
+
+void VideoDataHolder::action_quit(const CmdParamsMemo& t_memo){
+	std::exit(0);
 }
 
 const Video* VideoDataHolder::getVideoById(const std::string& t_videoId) const{

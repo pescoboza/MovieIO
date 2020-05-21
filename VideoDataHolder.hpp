@@ -126,6 +126,25 @@ private:
 
 	static std::string input(std::istream& t_in = std::cin);
 	std::pair<ActionBindings, bool> strToActionBinding(const std::string& t_input) const;
+
+	/*
+		SEARCH,
+		RATE,
+		SORT,
+		CLEAR,
+		HELP,
+		QUIT
+	*/
+
+	using PtrToConstStrVec = std::vector<const std::string*>;
+	using CmdParamsMemo = std::unordered_map<std::reference_wrapper<std::string>, PtrToConstStrVec>;
+
+	void action_search(const CmdParamsMemo& t_memo);
+	void actoin_rate(const CmdParamsMemo& t_memo);
+	void action_sort(const CmdParamsMemo& t_memo);
+	void action_clear(const CmdParamsMemo& t_memo = {});
+	void action_help(const CmdParamsMemo& t_memo = {});
+	void action_quit(const CmdParamsMemo& t_memo = {});
 };
 
 template<typename Functor>
