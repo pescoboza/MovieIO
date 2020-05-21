@@ -182,13 +182,47 @@ void VideoDataHolder::start(std::ostream& t_out, std::istream& t_in){
 	while (!isQuit) {
 		t_out << s_startScreen;
 		
-		auto words{ utl::getWords(input()) };
+		// Get the command that the user entered
+		auto words{ utl::getWords(input()) };	
 		auto actionPair{ strToActionBinding(words[0]) };
-		
-		if (!actionPair.second) {
+
+		// Splash an error screen if no command is recognized or if no parameters are given
+		if (!actionPair.second || words.size() == 1U) {
 			t_out << s_unkownCmdErrMsg << std::endl;
 			continue;
 		}
+
+		// Look for keywords of parameters of the entered command
+		auto action = actionPair.first;
+		auto cmdIt{ m_cmds.at(action) };
+
+		bool isUnknownKeyword{false};
+
+		// Iterate through the words
+		for (auto it{ ++words.cbegin() }; it != words.cend();) {
+			const auto& word{*it};
+
+			auto keywordIt{cmdIt.find(word)};
+			
+			// Check if the word is a keyword, else break and remember to splash error
+			if (keywordIt == cmdIt.cend()) {
+				isUnknownKeyword = true;
+				break;
+			}
+			
+			// Capture the number of args needed for the keyword
+			std::vector<const std::string*> paramArgs;
+			paramArgs.reserve(keywordIt->second);
+			for (unsigned i{ 0 }; i < keywordIt->second; i++) {
+				it++;
+				paramArgs.push_back(&*it);
+			}
+			
+			it++;
+		}
+		
+		
+		
 
 		switch (actionPair.first){
 		case ActionBindings::SEARCH:
