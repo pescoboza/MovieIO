@@ -194,35 +194,39 @@ void VideoDataHolder::start(std::ostream& t_out, std::istream& t_in){
 
 		// Look for keywords of parameters of the entered command
 		auto action = actionPair.first;
-		auto cmdIt{ m_cmds.at(action) };
+		auto cmdIt{ m_cmds.find(action) };
 
-		bool isUnknownKeyword{false};
+		// If the command exists, but its not in the map, it means it does not need any additional parameters
+		if (cmdIt != m_cmds.cend()) {
+			auto& paramsMap{cmdIt->second};
 
-		// Iterate through the words
-		for (auto it{ ++words.cbegin() }; it != words.cend();) {
-			const auto& word{*it};
+			bool isUnknownKeyword{ false };
 
-			auto keywordIt{cmdIt.find(word)};
-			
-			// Check if the word is a keyword, else break and remember to splash error
-			if (keywordIt == cmdIt.cend()) {
-				isUnknownKeyword = true;
-				break;
-			}
-			
-			// Capture the number of args needed for the keyword
-			std::vector<const std::string*> paramArgs;
-			paramArgs.reserve(keywordIt->second);
-			for (unsigned i{ 0 }; i < keywordIt->second; i++) {
+			// Iterate through the words
+			for (auto it{ ++words.cbegin() }; it != words.cend();) {
+				const auto& word{ *it };
+
+				auto keywordIt{ paramsMap.find(word) };
+
+				// Check if the word is a keyword, else break and remember to splash error
+				if (keywordIt == paramsMap.cend()) {
+					isUnknownKeyword = true;
+					break;
+				}
+
+				// Capture the number of args needed for the keyword
+				std::vector<const std::string*> paramArgs;
+				paramArgs.reserve(keywordIt->second);
+				for (unsigned i{ 0 }; i < keywordIt->second; i++) {
+					it++;
+					paramArgs.push_back(&*it);
+				}
+				// TODO: Figu
 				it++;
-				paramArgs.push_back(&*it);
 			}
-			
-			it++;
+
+
 		}
-		
-		
-		
 
 		switch (actionPair.first){
 		case ActionBindings::SEARCH:
