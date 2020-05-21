@@ -28,9 +28,10 @@ using ActionStrMap = std::multimap<std::string, ActionBindings>;
 using ActionPtr = std::unique_ptr<Action>;
 using ActionMap = std::unordered_map<ActionBindings, ActionPtr>;
 using NumArgs = unsigned;
-using CmdParamsMap = std::unordered_map<std::string, NumArgs>;
+using CmdParamsMap = std::unordered_map<std::reference_wrapper<std::string>, NumArgs>;
 using CmdsMap = std::unordered_map<ActionBindings, CmdParamsMap>;
-
+using PtrToConstStrVec = std::vector<const std::string*>;
+using CmdParamsMemo = std::unordered_map<std::reference_wrapper<std::string>, PtrToConstStrVec>;
 
 enum class SearchCategories {
 	NAME,
@@ -67,7 +68,7 @@ enum class SortVideosBy {
 	NAME,
 	ID,
 	RATING,
-	LENGTH
+	DURATION
 };
 
 
@@ -75,6 +76,7 @@ class VideoDataHolder {
 	
 	VideosMap m_videosById;
 	VideosVec m_videosVec;
+	VideosVec m_buffer;
 
 	MoviesVec m_movies;
 	SeriesMap m_series;
@@ -83,12 +85,14 @@ class VideoDataHolder {
 	ActionMap m_actionBindings;
 	CmdsMap m_cmds;
 
+	std::ostream& m_out;
+
 	static const std::string s_startScreen;
 	static const std::string s_unkownCmdErrMsg;
 	static const std::string s_helpMsg;
 
 public:
-	VideoDataHolder();
+	VideoDataHolder(std::ostream& t_out = std::cout);
 	void parseInfoFromFile(const std::string& t_filename);
 	void start(std::ostream& t_out = std::cout, std::istream& t_in = std::cin);
 
@@ -127,17 +131,27 @@ private:
 	static std::string input(std::istream& t_in = std::cin);
 	std::pair<ActionBindings, bool> strToActionBinding(const std::string& t_input) const;
 
-	/*
-		SEARCH,
-		RATE,
-		SORT,
-		CLEAR,
-		HELP,
-		QUIT
-	*/
 
-	using PtrToConstStrVec = std::vector<const std::string*>;
-	using CmdParamsMemo = std::unordered_map<std::reference_wrapper<std::string>, PtrToConstStrVec>;
+	struct ParametersSearch{
+		const std::string m_name{"name"};
+		const std::string m_id{"id"};
+		const std::string m_minrating{"minrating"};
+		const std::string m_maxrating{"maxrating"};
+		const std::string m_minduration{"minduration"};
+		const std::string m_maxduration{"maxduration"};
+		const std::string m_series{"series"};
+	}m_params_search;
+
+	struct ParametersSort{
+		const std::string m_nameAsc{"name+"};
+		const std::string m_nameDes{ "name-" };
+		const std::string m_idAsc{ "id+" };
+		const std::string m_idDes{"id-"};
+		const std::string m_ratingAsc{ "rating+" };
+		const std::string m_ratingDes{"rating-"};
+		const std::string m_durationAsc{ "duration+" };
+		const std::string m_durationDes{"duration-"};
+	}m_params_sort;
 
 	void action_search(const CmdParamsMemo& t_memo);
 	void actoin_rate(const CmdParamsMemo& t_memo);

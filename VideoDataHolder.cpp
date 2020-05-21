@@ -1,4 +1,5 @@
 #include "VideoDataHolder.hpp"
+#include <cstdlib>
 #include <stdexcept>
 #include <fstream>
 #include <functional>
@@ -8,8 +9,6 @@
 
 namespace js = nlohmann;
 
-using PtrToConstStrVec = std::vector<const std::string*>;
-using CmdParamsMemo = std::unordered_map<std::reference_wrapper<std::string>,PtrToConstStrVec>;
 
 #ifdef _DEBUG
 #include <unordered_set>
@@ -62,8 +61,10 @@ R"(Usage)"
 const std::string VideoDataHolder::s_unkownCmdErrMsg{ "Err" };
 const std::string VideoDataHolder::s_startScreen{ "SC" };
 
-VideoDataHolder::VideoDataHolder() : 
-	m_videosById{}, 
+VideoDataHolder::VideoDataHolder(std::ostream& t_out) :
+	m_out{ t_out },
+	m_videosById{},
+	m_buffer{},
 	m_movies{}, 
 	m_series{}, 
 	m_actions{
@@ -90,29 +91,35 @@ VideoDataHolder::VideoDataHolder() :
 		bindings.emplace(ActionBindings::QUIT,		std::make_unique<Action>(ActionBindings::QUIT,	"descritpion", "usage"));
 		return std::move(bindings);
 	}()},
-	m_cmds{ []() {
+	m_cmds{ [this]() {
 		CmdsMap cmds;
 
 		CmdParamsMap params;
 
 		// Search
-		params.emplace("name",			1U);
-		params.emplace("id",			1U);
-		params.emplace("minrating",		1U);
-		params.emplace("maxrating",		1U);
-		params.emplace("minduration",	1U);
-		params.emplace("maxduration",	1U);
-		params.emplace("series",		1U);
+		params.emplace(m_params_search.m_name,			1U);
+		params.emplace(m_params_search.m_id,			1U);
+		params.emplace(m_params_search.m_minrating,		1U);
+		params.emplace(m_params_search.m_maxrating,		1U);
+		params.emplace(m_params_search.m_minduration,	1U);
+		params.emplace(m_params_search.m_minduration,	1U);
+		params.emplace(m_params_search.m_series,		1U);
 
 		cmds.emplace(ActionBindings::SEARCH, std::move(params));
 		params.clear();
 
 		// Sort
-		params.emplace("name+",		1U);
-		params.emplace("name-",		1U);
-		params.emplace("rating+",	1U);
-		params.emplace("rating-",	1U);
-		params.emplace("series",	1U);
+		params.emplace(m_params_sort.m_nameAsc, 0U);
+		params.emplace(m_params_sort.m_nameDes, 0U);
+		
+		params.emplace(m_params_sort.m_idAsc,	0U);
+		params.emplace(m_params_sort.m_idDes,	0U);
+
+		params.emplace(m_params_sort.m_ratingAsc, 0U);
+		params.emplace(m_params_sort.m_ratingDes, 0U);
+		
+		params.emplace(m_params_sort.m_durationAsc, 0U);
+		params.emplace(m_params_sort.m_durationDes, 0U);
 
 		cmds.emplace(ActionBindings::SORT, std::move(params));
 		params.clear();
@@ -319,6 +326,45 @@ std::pair<ActionBindings, bool> VideoDataHolder::strToActionBinding(const std::s
 	return { it->second, true };
 }
 
+void VideoDataHolder::action_search(const CmdParamsMemo& t_memo){
+	auto& cmd{ m_cmds.at(ActionBindings::SEARCH) };
+	for (const auto kwP : t_memo) {
+		m_
+	}
+	
+	/*
+	
+	"id",			1U);
+	"minrating",		1U);
+	"maxrating",		1U);
+	"minduration",	1U);
+	"maxduration",	1U);
+	"series",
+	*/
+
+	VideoDataHolder::filterVideos
+}
+
+void VideoDataHolder::actoin_rate(const CmdParamsMemo& t_memo)
+{
+}
+
+void VideoDataHolder::action_sort(const CmdParamsMemo& t_memo)
+{
+}
+
+void VideoDataHolder::action_clear(const CmdParamsMemo& t_memo){
+#if defined( __WIN32__) || defined(_WIN32) || defined(__CYGWIN32__)
+	std::system("cls");
+#else
+	std::system("clear");
+#endif // WIN32
+}
+
+void VideoDataHolder::action_help(const CmdParamsMemo& t_memo){
+	m_out << s_helpMsg << std::endl;
+}
+
 void VideoDataHolder::action_quit(const CmdParamsMemo& t_memo){
 	std::exit(0);
 }
@@ -429,7 +475,7 @@ VideosVec& VideoDataHolder::sortVideosBy(const VideosVec& t_inVideos, VideosVec&
 		for (const auto& p : videos) { temp.push_back(p.second); }
 	}
 		break;
-	case SortVideosBy::LENGTH:
+	case SortVideosBy::DURATION:
 	{
 		std::multimap<int, Video*> videos;
 		for (const auto& v : t_inVideos) { videos.emplace(v->getDuration(), v); }
