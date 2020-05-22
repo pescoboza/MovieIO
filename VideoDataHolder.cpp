@@ -99,6 +99,7 @@ VideoDataHolder::VideoDataHolder(std::ostream& t_out) :
 		// Search
 		params.emplace(m_params_search.m_name,			1U);
 		params.emplace(m_params_search.m_id,			1U);
+		params.emplace(m_params_search.m_genre,			1U);
 		params.emplace(m_params_search.m_minrating,		1U);
 		params.emplace(m_params_search.m_maxrating,		1U);
 		params.emplace(m_params_search.m_minduration,	1U);
@@ -111,22 +112,14 @@ VideoDataHolder::VideoDataHolder(std::ostream& t_out) :
 		// Sort
 		params.emplace(m_params_sort.m_nameAsc, 0U);
 		params.emplace(m_params_sort.m_nameDes, 0U);
-		
 		params.emplace(m_params_sort.m_idAsc,	0U);
 		params.emplace(m_params_sort.m_idDes,	0U);
-
 		params.emplace(m_params_sort.m_ratingAsc, 0U);
 		params.emplace(m_params_sort.m_ratingDes, 0U);
-		
 		params.emplace(m_params_sort.m_durationAsc, 0U);
 		params.emplace(m_params_sort.m_durationDes, 0U);
 
 		cmds.emplace(ActionBindings::SORT, std::move(params));
-		params.clear();
-
-		params.emplace("rate", 2U);
-		cmds.emplace(ActionBindings::RATE, std::move(params));
-
 
 		return std::move(cmds);
 	}() }
@@ -326,23 +319,83 @@ std::pair<ActionBindings, bool> VideoDataHolder::strToActionBinding(const std::s
 	return { it->second, true };
 }
 
-void VideoDataHolder::action_search(const CmdParamsMemo& t_memo){
-	auto& cmd{ m_cmds.at(ActionBindings::SEARCH) };
-	for (const auto kwP : t_memo) {
-		m_
-	}
-	
-	/*
-	
-	"id",			1U);
-	"minrating",		1U);
-	"maxrating",		1U);
-	"minduration",	1U);
-	"maxduration",	1U);
-	"series",
-	*/
+void VideoDataHolder::action_search(const CmdParamsMemo& t_memo) {
+	const std::string* name{ &utl::emptyStr };
+	const std::string* id{ &utl::emptyStr };
+	const std::string* genre{ &utl::emptyStr };
+	const std::string* series{ &utl::emptyStr };
+	float minr{ Video::s_minRating };
+	float maxr{ Video::s_maxRating };
+	float mind{ Video::s_minDuration };
+	float maxd{ Video::s_maxDuration };
 
-	VideoDataHolder::filterVideos
+	std::vector<bool> alreadyRead{8, false};
+
+	for (const auto& kwP : t_memo) {
+		const auto& param{ kwP.first.get() };
+		const auto& args{ kwP.second };
+
+		if (param == m_params_search.m_name && !alreadyRead[0]) { 
+			name = args[0]; 
+			alreadyRead[0] = true;
+		}
+		else if (param == m_params_search.m_id && !alreadyRead[1]) { 
+			id = args[0]; 
+			alreadyRead[1] = true;
+		}
+		else if (param == m_params_search.m_genre && !alreadyRead[2]) { 
+			genre = args[0]; 
+			alreadyRead[2] = true;
+		}
+		else if (param == m_params_search.m_series && !alreadyRead[3]) { 
+			series = args[0]; 
+			alreadyRead[3] = true;
+		}
+		else if (param == m_params_search.m_minrating && !alreadyRead[4]) {
+			try {
+				minr = std::stof(param);
+			}
+			catch (std::invalid_argument& e) {
+				minr = Video::s_minRating;
+			}
+			alreadyRead[4] = true;
+		}
+		else if (param == m_params_search.m_maxrating && !alreadyRead[5]) { 
+			try {
+				maxr = std::stof(param);
+			}
+			catch (std::invalid_argument& e) {
+				maxr = Video::s_maxRating;
+			}
+			alreadyRead[5] = true;
+		}
+		else if (param == m_params_search.m_minduration && !alreadyRead[6]) { 
+			try {
+				mind = std::stof(param);
+			}
+			catch (std::invalid_argument& e) {
+				mind = Video::s_minDuration;
+			}
+			alreadyRead[6] = true;
+		}
+		else if (param == m_params_search.m_maxduration && !alreadyRead[7]) { 
+			try {
+				maxd = std::stof(param);
+			}
+			catch (std::invalid_argument& e) {
+				maxd = Video::s_maxDuration;
+			}
+			alreadyRead[7] = true;
+		}
+
+	}
+
+	if (minr < Video::s_minRating) { minr = Video::s_minRating; }
+	if (maxr > Video::s_maxRating) { maxr = Video::s_maxRating; }
+	if (mind < Video::s_minRating) { minr = Video::s_minDuration; }
+	if (maxd > Video::s_maxDuration) { maxd = Video::s_maxDuration; }
+
+	VideoDataHolder::filterVideos(m_buffer, *name, *id, *genre, *series, { minr, maxr }, {mind, maxd});
 }
 
 void VideoDataHolder::actoin_rate(const CmdParamsMemo& t_memo)
@@ -413,13 +466,16 @@ void VideoDataHolder::printVideos(const VideosVec& t_videos, unsigned t_numEntri
 	}
 }
 
-VideosVec& VideoDataHolder::filterVideos(VideosVec& t_outVideos, const std::string& t_name, const std::string& t_genre, const std::string& t_series, const std::pair<float, float>& t_rating) const{
+VideosVec& VideoDataHolder::filterVideos(VideosVec& t_outVideos, const std::string& t_name, const std::string& t_id, const std::string& t_genre, const std::string& t_series, const std::pair<float, float>& t_rating, const std::pair<int ,int>& t_duration) const{
 
 	auto filterFunction{ [&](const Video& t_video) {
 		
 		// Check name matches
 		if (!t_name.empty() && t_name != t_video.getName()) {return false;}
 		
+		// Check id matches
+		if (!t_id.empty() && t_id != t_video.getId()) { return false; }
+
 		// Check genre matches
 		{
 			Genre genre;

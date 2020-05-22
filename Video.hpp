@@ -29,6 +29,8 @@ class Video {
 public:	
 	static const float s_minRating;
 	static const float s_maxRating;
+	static const int s_minDuration;
+	static const int s_maxDuration;
 
 private:
 	static const GenreMap s_genresStrings;

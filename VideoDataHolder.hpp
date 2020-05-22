@@ -112,10 +112,14 @@ public:
 	
 	static void printVideos(const VideosVec& t_videos, unsigned t_numEntries, bool t_printHeader = true, std::ostream& t_out = std::cout);
 
-	VideosVec& filterVideos(VideosVec& t_outVideos, const std::string& t_name = "",
+	VideosVec& filterVideos(VideosVec& t_outVideos, 
+		const std::string& t_name = "",
+		const std::string& t_id = "",
 		const std::string& t_genre = "",
 		const std::string& t_series = "",
-		const std::pair<float, float>& t_rating = {Video::s_minRating, Video::s_maxRating}) const;
+		const std::pair<float, float>& t_rating = {Video::s_minRating, Video::s_maxRating},
+		const std::pair<int, int>& t_duration = {Video::s_minDuration, Video::s_maxDuration}
+	) const;
 
 	
 	static VideosVec& sortVideosBy(const VideosVec& t_inVideos, VideosVec& t_outVideos, SortVideosBy t_criteria, bool t_ascending = true);
@@ -135,6 +139,7 @@ private:
 	struct ParametersSearch{
 		const std::string m_name{"name"};
 		const std::string m_id{"id"};
+		const std::string m_genre{ "genre" };
 		const std::string m_minrating{"minrating"};
 		const std::string m_maxrating{"maxrating"};
 		const std::string m_minduration{"minduration"};

@@ -22,5 +22,7 @@ namespace utl {
 		std::vector<const std::string*>& t_outWords,
 		const std::string& t_keyword,
 		unsigned t_n);
+
+	const std::string emptyStr{ "" };
 };
 #endif // !UTILITIES_HPP

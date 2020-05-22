@@ -27,6 +27,9 @@ const Video::TableParams Video::s_tbl{
 
 const float Video::s_minRating{ 0.f };
 const float Video::s_maxRating{ 5.f };
+const int Video::s_minDuration{0};
+const int Video::s_maxDuration{36000};
+
 
 const GenreMap Video::s_genresStrings{
 	{"action", Genre::ACTION},
