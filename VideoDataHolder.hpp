@@ -13,7 +13,7 @@
 #include <vector>
 
 class Action;
-enum class SortVideosBy;
+enum class SortCriteria;
 enum class Actions;
 enum class ActionBindings;
 
@@ -32,6 +32,7 @@ using CmdParamsMap = std::unordered_map<std::reference_wrapper<std::string>, Num
 using CmdsMap = std::unordered_map<ActionBindings, CmdParamsMap>;
 using PtrToConstStrVec = std::vector<const std::string*>;
 using CmdParamsMemo = std::unordered_map<std::reference_wrapper<std::string>, PtrToConstStrVec>;
+using SortMemo = std::vector<std::pair<SortCriteria, bool>>; // true -> descending, false -> descending
 
 enum class SearchCategories {
 	NAME,
@@ -64,7 +65,7 @@ public:
 	
 };
 
-enum class SortVideosBy {
+enum class SortCriteria {
 	NAME,
 	ID,
 	RATING,
@@ -123,7 +124,7 @@ public:
 	) const;
 
 
-	static VideosVec& sortVideosBy(const VideosVec& t_inVideos, VideosVec& t_outVideos, SortVideosBy t_criteria, bool t_ascending = true);
+	static VideosVec& sortVideosBy(const VideosVec& t_inVideos, VideosVec& t_outVideos, const SortMemo& t_criteria);
 
 private:
 	static const std::string s_initMsg;
@@ -149,14 +150,10 @@ private:
 	}m_params_search;
 
 	struct ParametersSort {
-		const std::string m_nameAsc{ "name+" };
-		const std::string m_nameDes{ "name-" };
-		const std::string m_idAsc{ "id+" };
-		const std::string m_idDes{ "id-" };
-		const std::string m_ratingAsc{ "rating+" };
-		const std::string m_ratingDes{ "rating-" };
-		const std::string m_durationAsc{ "duration+" };
-		const std::string m_durationDes{ "duration-" };
+		const std::string m_name{ "name+" };
+		const std::string m_id{ "id" };
+		const std::string m_rating{ "rating" };
+		const std::string m_duration{ "duration" };
 	}m_params_sort;
 
 	struct ParametersRate {
@@ -165,6 +162,8 @@ private:
 		const std::string m_err_rating{ "Invalid rating value." };
 	}m_params_rate;
 
+	static bool compareVideos(SortCriteria t_criterion, const Video& t_a, const Video& t_b);
+	
 	void action_search(const CmdParamsMemo& t_memo);
 	void actoin_rate(const CmdParamsMemo& t_memo);
 	void action_sort(const CmdParamsMemo& t_memo);

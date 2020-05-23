@@ -1,4 +1,5 @@
 #include "Utilities.hpp"
+#include <algorithm>
 
 namespace utl {
 
@@ -60,5 +61,8 @@ namespace utl {
 		}
 
 		return true;
+	}
+	bool lexCompStrs(const std::string& t_a, const std::string& t_b){
+		return std::lexicographical_compare(t_a.cbegin(), t_a.cend(), t_b.cbegin(), t_b.cend());
 	}
 };

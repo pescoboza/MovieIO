@@ -18,7 +18,7 @@ int main(int argc, char* argv[]) {
 		
 		VideosVec videos;
 		videoSystem.filterVideos(videos, "", "", "", {0.f, 5.f});
-		VideoDataHolder::sortVideosBy(videos,videos, SortVideosBy::RATING);
+		VideoDataHolder::sortVideosBy(videos,videos, SortCriteria::RATING);
 		VideoDataHolder::printVideos(videos,0U);
 		
 	// TODO: Add main loop

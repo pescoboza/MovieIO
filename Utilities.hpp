@@ -23,6 +23,8 @@ namespace utl {
 		const std::string& t_keyword,
 		unsigned t_n);
 
+	bool lexCompStrs(const std::string& t_a, const std::string& t_b);
+
 	const std::string emptyStr{ "" };
 };
 #endif // !UTILITIES_HPP

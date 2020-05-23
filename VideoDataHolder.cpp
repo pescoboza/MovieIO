@@ -1,4 +1,5 @@
 #include "VideoDataHolder.hpp"
+#include <algorithm>
 #include <cstdlib>
 #include <stdexcept>
 #include <fstream>
@@ -110,14 +111,10 @@ VideoDataHolder::VideoDataHolder(std::ostream& t_out) :
 		params.clear();
 
 		// Sort
-		params.emplace(m_params_sort.m_nameAsc, 0U);
-		params.emplace(m_params_sort.m_nameDes, 0U);
-		params.emplace(m_params_sort.m_idAsc,	0U);
-		params.emplace(m_params_sort.m_idDes,	0U);
-		params.emplace(m_params_sort.m_ratingAsc, 0U);
-		params.emplace(m_params_sort.m_ratingDes, 0U);
-		params.emplace(m_params_sort.m_durationAsc, 0U);
-		params.emplace(m_params_sort.m_durationDes, 0U);
+		params.emplace(m_params_sort.m_name,		1U);
+		params.emplace(m_params_sort.m_id,			1U);
+		params.emplace(m_params_sort.m_rating,		1U);
+		params.emplace(m_params_sort.m_duration,	1U);
 
 		cmds.emplace(ActionBindings::SORT, std::move(params));
 		params.clear();
@@ -326,6 +323,10 @@ std::pair<ActionBindings, bool> VideoDataHolder::strToActionBinding(const std::s
 	return { it->second, true };
 }
 
+bool VideoDataHolder::compareVideos(SortCriteria t_criterion, const Video& t_a, const Video& t_b){
+	return false;
+}
+
 void VideoDataHolder::action_search(const CmdParamsMemo& t_memo) {
 	const std::string* name{ &utl::emptyStr };
 	const std::string* id{ &utl::emptyStr };
@@ -409,12 +410,12 @@ void VideoDataHolder::actoin_rate(const CmdParamsMemo& t_memo) {
 	const std::string* id{ &utl::emptyStr };
 	float rating{ Video::s_minRating };
 	bool isRatingValid{ false };
-
+	
+	bool alreadyRead[2] = { false, false };
+	
 	for (const auto& kwP : t_memo) {
 		const auto& param{ kwP.first.get() };
-		const auto& args{ kwP.second };
-
-		bool alreadyRead[2] = { false, false };
+		const auto& args{ kwP.second };	
 
 		if (!alreadyRead[0] && param == m_params_rate.m_id) {
 			id = args[0];
@@ -445,8 +446,11 @@ void VideoDataHolder::actoin_rate(const CmdParamsMemo& t_memo) {
 		videoIt->second->rate(rating);
 	}	
 }
-void VideoDataHolder::action_sort(const CmdParamsMemo& t_memo)
-{
+void VideoDataHolder::action_sort(const CmdParamsMemo& t_memo){
+	
+	const std::string* sortValue{&m_para};
+	bool descending{ false };
+		
 }
 
 void VideoDataHolder::action_clear(const CmdParamsMemo& t_memo){
@@ -548,49 +552,43 @@ VideosVec& VideoDataHolder::filterVideos(VideosVec& t_outVideos, const std::stri
 	return t_outVideos;
 }
 
-VideosVec& VideoDataHolder::sortVideosBy(const VideosVec& t_inVideos, VideosVec& t_outVideos, SortVideosBy t_criteria, bool t_ascending){
-	VideosVec temp;
-	temp.reserve(t_inVideos.size());
+VideosVec& VideoDataHolder::sortVideosBy(const VideosVec& t_inVideos, VideosVec& t_outVideos, const SortMemo& t_criteria){
 
-	switch (t_criteria)	{
-	case SortVideosBy::NAME: 
-	{
-		std::multimap<std::string, Video*> videos;
-		for (const auto& v : t_inVideos) { videos.emplace(v->getName(), v); }
-		for (const auto& p : videos) { temp.push_back(p.second); }
-	}
-		break;
-	case SortVideosBy::ID:
-	{
-		std::multimap<std::string, Video*> videos;
-		for (const auto& v : t_inVideos) { videos.emplace(v->getId(), v); }
-		for (const auto& p : videos) { temp.push_back(p.second); }
-	}
-		break;
-	case SortVideosBy::RATING:
-	{
-		std::multimap<float, Video*> videos;
-		for (const auto& v : t_inVideos) { videos.emplace(v->getRating(), v); }
-		for (const auto& p : videos) { temp.push_back(p.second); }
-	}
-		break;
-	case SortVideosBy::DURATION:
-	{
-		std::multimap<int, Video*> videos;
-		for (const auto& v : t_inVideos) { videos.emplace(v->getDuration(), v); }
-		for (const auto& p : videos) { temp.push_back(p.second); }
-	}
-		break;
-	default:
-		break;
+	// Remove repeated entries, since for the order of criteria to be kept, a vector was to be used
+	std::unordered_set<SortCriteria> validationSet;
+	std::vector<const std::pair<SortCriteria, bool>*> validatedCriteria;
+	for (const auto& p : t_criteria) {
+		auto it{validationSet.emplace(p.first)};
+		if (it.second) { validatedCriteria.push_back(&p); }
 	}
 
-	if (t_ascending) { std::reverse(temp.begin(), temp.end()); }
 
-	t_outVideos = std::move(temp);
+	auto compare{
+		[&validatedCriteria](const Video& t_a, const Video t_b) {
+			
+			for (const auto& ptr : validatedCriteria) {
+				switch (SortCriteria)
+				{
+				case SortCriteria::NAME:
+					break;
+				case SortCriteria::ID:
+					break;
+				case SortCriteria::RATING:
+					break;
+				case SortCriteria::DURATION:
+					break;
+				default:
+					break;
+				}
+			
+			}
+		}
+	};
+
+	t_outVideos = t_inVideos;
+	std::sort(t_outVideos.begin(), t_outVideos.end(), compare);
 	return t_outVideos;
 }
-
 
 
 Action::Action(ActionBindings t_boundAction, const std::string& t_desc, const std::string& t_usage) : 
