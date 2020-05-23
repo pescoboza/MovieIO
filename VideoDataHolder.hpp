@@ -162,7 +162,8 @@ private:
 		const std::string m_err_rating{ "Invalid rating value." };
 	}m_params_rate;
 
-	static bool compareVideos(SortCriteria t_criterion, const Video& t_a, const Video& t_b);
+	static bool isLesser(SortCriteria t_criterion, const Video& t_a, const Video& t_b);
+	static bool isEqual(SortCriteria t_criterion, const Video& t_a, const Video& t_b);
 	
 	void action_search(const CmdParamsMemo& t_memo);
 	void actoin_rate(const CmdParamsMemo& t_memo);

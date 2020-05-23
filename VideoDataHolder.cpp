@@ -323,8 +323,36 @@ std::pair<ActionBindings, bool> VideoDataHolder::strToActionBinding(const std::s
 	return { it->second, true };
 }
 
-bool VideoDataHolder::compareVideos(SortCriteria t_criterion, const Video& t_a, const Video& t_b){
-	return false;
+bool VideoDataHolder::isLesser(SortCriteria t_criterion, const Video& t_a, const Video& t_b){
+	switch (t_criterion)
+	{
+	case SortCriteria::NAME:
+		return  utl::lexCompStrs(t_b.getName(), t_a.getName());
+	case SortCriteria::ID:
+		return  utl::lexCompStrs(t_b.getId(), t_a.getId());
+	case SortCriteria::RATING:
+		return t_a.getRating() < t_b.getRating();
+	case SortCriteria::DURATION:
+		return t_a.getDuration() < t_b.getDuration();
+	default:
+		return false;
+	}
+}
+
+bool VideoDataHolder::isEqual(SortCriteria t_criterion, const Video& t_a, const Video& t_b){
+	switch (t_criterion)
+	{
+	case SortCriteria::NAME:
+		return t_a.getName() == t_b.getName();
+	case SortCriteria::ID:
+		return t_a.getId() == t_b.getId();
+	case SortCriteria::RATING:
+		return t_a.getRating() == t_b.getRating();
+	case SortCriteria::DURATION:
+		return t_a.getDuration() == t_b.getDuration();
+	default:
+		return false;
+	}
 }
 
 void VideoDataHolder::action_search(const CmdParamsMemo& t_memo) {
@@ -562,25 +590,16 @@ VideosVec& VideoDataHolder::sortVideosBy(const VideosVec& t_inVideos, VideosVec&
 		if (it.second) { validatedCriteria.push_back(&p); }
 	}
 
-
 	auto compare{
-		[&validatedCriteria](const Video& t_a, const Video t_b) {
-			
-			for (const auto& ptr : validatedCriteria) {
-				switch (SortCriteria)
-				{
-				case SortCriteria::NAME:
-					break;
-				case SortCriteria::ID:
-					break;
-				case SortCriteria::RATING:
-					break;
-				case SortCriteria::DURATION:
-					break;
-				default:
-					break;
+		[&validatedCriteria](const Video* t_a, const Video* t_b) {
+			for (const auto& p : validatedCriteria) {
+				const auto& criterion{p->first};
+				bool isDescending{p->second};
+
+				if (!VideoDataHolder::isEqual(criterion, *t_a, *t_b)) {
+					bool c{ VideoDataHolder::isLesser(criterion, *t_a, *t_b) };
+					return isDescending ? c : !c; 
 				}
-			
 			}
 		}
 	};
