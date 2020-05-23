@@ -73,7 +73,7 @@ enum class SortVideosBy {
 
 
 class VideoDataHolder {
-	
+
 	VideosMap m_videosById;
 	VideosVec m_videosVec;
 	VideosVec m_buffer;
@@ -90,6 +90,7 @@ class VideoDataHolder {
 	static const std::string s_startScreen;
 	static const std::string s_unkownCmdErrMsg;
 	static const std::string s_helpMsg;
+	static const std::string s_notFoundErr;
 
 public:
 	VideoDataHolder(std::ostream& t_out = std::cout);
@@ -102,26 +103,26 @@ public:
 
 	const Series* getSeriesByName(const std::string& t_name) const; // Returns nullptr if video is not found
 	Series* getSeriesByName(const std::string& t_name); // Returns nullptr if video is not found
-	
+
 	std::vector<Movie*>& getMovies(std::vector<Movie*>& t_outMovies);
 
 
 	// Returns all the video entries that match the filter function
 	template <typename Functor>
 	static VideosVec& filter(Functor t_filter, const VideosVec& t_inVideos, VideosVec& t_outVideos);
-	
+
 	static void printVideos(const VideosVec& t_videos, unsigned t_numEntries, bool t_printHeader = true, std::ostream& t_out = std::cout);
 
-	VideosVec& filterVideos(VideosVec& t_outVideos, 
+	VideosVec& filterVideos(VideosVec& t_outVideos,
 		const std::string& t_name = "",
 		const std::string& t_id = "",
 		const std::string& t_genre = "",
 		const std::string& t_series = "",
-		const std::pair<float, float>& t_rating = {Video::s_minRating, Video::s_maxRating},
-		const std::pair<int, int>& t_duration = {Video::s_minDuration, Video::s_maxDuration}
+		const std::pair<float, float>& t_rating = { Video::s_minRating, Video::s_maxRating },
+		const std::pair<int, int>& t_duration = { Video::s_minDuration, Video::s_maxDuration }
 	) const;
 
-	
+
 	static VideosVec& sortVideosBy(const VideosVec& t_inVideos, VideosVec& t_outVideos, SortVideosBy t_criteria, bool t_ascending = true);
 
 private:
@@ -136,27 +137,33 @@ private:
 	std::pair<ActionBindings, bool> strToActionBinding(const std::string& t_input) const;
 
 
-	struct ParametersSearch{
-		const std::string m_name{"name"};
-		const std::string m_id{"id"};
+	struct ParametersSearch {
+		const std::string m_name{ "name" };
+		const std::string m_id{ "id" };
 		const std::string m_genre{ "genre" };
-		const std::string m_minrating{"minrating"};
-		const std::string m_maxrating{"maxrating"};
-		const std::string m_minduration{"minduration"};
-		const std::string m_maxduration{"maxduration"};
-		const std::string m_series{"series"};
+		const std::string m_minrating{ "minrating" };
+		const std::string m_maxrating{ "maxrating" };
+		const std::string m_minduration{ "minduration" };
+		const std::string m_maxduration{ "maxduration" };
+		const std::string m_series{ "series" };
 	}m_params_search;
 
-	struct ParametersSort{
-		const std::string m_nameAsc{"name+"};
+	struct ParametersSort {
+		const std::string m_nameAsc{ "name+" };
 		const std::string m_nameDes{ "name-" };
 		const std::string m_idAsc{ "id+" };
-		const std::string m_idDes{"id-"};
+		const std::string m_idDes{ "id-" };
 		const std::string m_ratingAsc{ "rating+" };
-		const std::string m_ratingDes{"rating-"};
+		const std::string m_ratingDes{ "rating-" };
 		const std::string m_durationAsc{ "duration+" };
-		const std::string m_durationDes{"duration-"};
+		const std::string m_durationDes{ "duration-" };
 	}m_params_sort;
+
+	struct ParametersRate {
+		const std::string m_id{ "id" };
+		const std::string m_rating{ "rating" };
+		const std::string m_err_rating{ "Invalid rating value." };
+	}m_params_rate;
 
 	void action_search(const CmdParamsMemo& t_memo);
 	void actoin_rate(const CmdParamsMemo& t_memo);

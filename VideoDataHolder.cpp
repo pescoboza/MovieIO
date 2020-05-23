@@ -120,6 +120,13 @@ VideoDataHolder::VideoDataHolder(std::ostream& t_out) :
 		params.emplace(m_params_sort.m_durationDes, 0U);
 
 		cmds.emplace(ActionBindings::SORT, std::move(params));
+		params.clear();
+
+		// Rate
+		params.emplace(m_params_rate.m_id, 1U);
+		params.emplace(m_params_rate.m_rating, 1U);
+		
+		cmds.emplace(ActionBindings::RATE, std::move(params));
 
 		return std::move(cmds);
 	}() }
@@ -335,52 +342,52 @@ void VideoDataHolder::action_search(const CmdParamsMemo& t_memo) {
 		const auto& param{ kwP.first.get() };
 		const auto& args{ kwP.second };
 
-		if (param == m_params_search.m_name && !alreadyRead[0]) { 
+		if (!alreadyRead[0] && param == m_params_search.m_name) {
 			name = args[0]; 
 			alreadyRead[0] = true;
 		}
-		else if (param == m_params_search.m_id && !alreadyRead[1]) { 
+		else if (!alreadyRead[1] && param == m_params_search.m_id) {
 			id = args[0]; 
 			alreadyRead[1] = true;
 		}
-		else if (param == m_params_search.m_genre && !alreadyRead[2]) { 
+		else if (!alreadyRead[2] && param == m_params_search.m_genre) {
 			genre = args[0]; 
 			alreadyRead[2] = true;
 		}
-		else if (param == m_params_search.m_series && !alreadyRead[3]) { 
+		else if (!alreadyRead[3] && param == m_params_search.m_series) {
 			series = args[0]; 
 			alreadyRead[3] = true;
 		}
-		else if (param == m_params_search.m_minrating && !alreadyRead[4]) {
+		else if (!alreadyRead[4] && param == m_params_search.m_minrating) {
 			try {
-				minr = std::stof(param);
+				minr = std::stof(*args[0]);
 			}
 			catch (std::invalid_argument& e) {
 				minr = Video::s_minRating;
 			}
 			alreadyRead[4] = true;
 		}
-		else if (param == m_params_search.m_maxrating && !alreadyRead[5]) { 
+		else if (!alreadyRead[5] && param == m_params_search.m_maxrating) {
 			try {
-				maxr = std::stof(param);
+				maxr = std::stof(*args[0]);
 			}
 			catch (std::invalid_argument& e) {
 				maxr = Video::s_maxRating;
 			}
 			alreadyRead[5] = true;
 		}
-		else if (param == m_params_search.m_minduration && !alreadyRead[6]) { 
+		else if (!alreadyRead[6] && param == m_params_search.m_minduration) {
 			try {
-				mind = std::stof(param);
+				mind = std::stof(*args[0]);
 			}
 			catch (std::invalid_argument& e) {
 				mind = Video::s_minDuration;
 			}
 			alreadyRead[6] = true;
 		}
-		else if (param == m_params_search.m_maxduration && !alreadyRead[7]) { 
+		else if (!alreadyRead[7] && param == m_params_search.m_maxduration) {
 			try {
-				maxd = std::stof(param);
+				maxd = std::stof(*args[0]);
 			}
 			catch (std::invalid_argument& e) {
 				maxd = Video::s_maxDuration;
@@ -398,10 +405,46 @@ void VideoDataHolder::action_search(const CmdParamsMemo& t_memo) {
 	VideoDataHolder::filterVideos(m_buffer, *name, *id, *genre, *series, { minr, maxr }, {mind, maxd});
 }
 
-void VideoDataHolder::actoin_rate(const CmdParamsMemo& t_memo)
-{
-}
+void VideoDataHolder::actoin_rate(const CmdParamsMemo& t_memo) {
+	const std::string* id{ &utl::emptyStr };
+	float rating{ Video::s_minRating };
+	bool isRatingValid{ false };
 
+	for (const auto& kwP : t_memo) {
+		const auto& param{ kwP.first.get() };
+		const auto& args{ kwP.second };
+
+		bool alreadyRead[2] = { false, false };
+
+		if (!alreadyRead[0] && param == m_params_rate.m_id) {
+			id = args[0];
+			alreadyRead[0] = true;
+		}
+		else if (!alreadyRead[1] && param == m_params_rate.m_rating) {
+			try {
+				isRatingValid = true;
+				rating = std::stof(*args[0]);
+				alreadyRead[1] = true;
+			}
+			catch (std::invalid_argument& e) {
+				rating = Video::s_minRating;
+				isRatingValid = false;
+
+			}
+		}
+	}
+	
+	auto videoIt{ m_videosById.find(*id) };
+	if (videoIt == m_videosById.end()) {
+		m_out << s_notFoundErr << std::endl;
+	}
+	else if (!isRatingValid) {
+		m_out << m_params_rate.m_err_rating << std::endl;
+	}
+	else {
+		videoIt->second->rate(rating);
+	}	
+}
 void VideoDataHolder::action_sort(const CmdParamsMemo& t_memo)
 {
 }
