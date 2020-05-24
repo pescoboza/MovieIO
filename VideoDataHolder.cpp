@@ -641,7 +641,6 @@ VideosVec& VideoDataHolder::sortVideosBy(const VideosVec& t_inVideos, VideosVec&
 					return isDescending ? c : !c; 
 				}
 			}
-			throw std::runtime_error("Could not resolve comparison for videos.\n");
 			return false;
 		}
 	};
