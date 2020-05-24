@@ -15,10 +15,18 @@ int main(int argc, char* argv[]) {
 
 		std::cout << "Loading data..." << std::endl;
 		videoSystem.parseInfoFromFile(argv[1]);
-		
+		/* VideosVec& t_outVideos, 
+			const std::string& t_name, 
+			const std::string& t_id, 
+			const std::string& t_genre, 
+			const std::string& t_series, 
+			const std::pair<float, float>& t_rating, 
+			const std::pair<int , int>& t_duration*/
 		VideosVec videos;
-		videoSystem.filterVideos(videos, "", "", "", {0.f, 5.f});
-		VideoDataHolder::sortVideosBy(videos,videos, SortCriteria::RATING);
+		videoSystem.filterVideos(videos, "", "", "", "", {0.f, 5.f});
+
+		SortMemo sort{ {SortCriteria::RATING, true},{SortCriteria::DURATION, true} };
+		VideoDataHolder::sortVideosBy(videos,videos, sort);
 		VideoDataHolder::printVideos(videos,0U);
 		
 	// TODO: Add main loop

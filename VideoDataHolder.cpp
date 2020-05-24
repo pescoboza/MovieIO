@@ -59,6 +59,11 @@ const std::string VideoDataHolder::s_initMsg{
 R"(Usage)"
 };
 
+const std::string VideoDataHolder::s_notFoundErr{ "ERROR: Could not find a result for the given query." };
+const std::string VideoDataHolder::s_helpMsg{ 
+	R"(Help)" 
+};
+
 const std::string VideoDataHolder::s_unkownCmdErrMsg{ "Err" };
 const std::string VideoDataHolder::s_startScreen{ "SC" };
 
@@ -366,10 +371,10 @@ void VideoDataHolder::action_search(const Parameters& t_params) {
 	const std::string* series{ &utl::emptyStr };
 	float minr{ Video::s_minRating };
 	float maxr{ Video::s_maxRating };
-	float mind{ Video::s_minDuration };
-	float maxd{ Video::s_maxDuration };
+	int mind{ Video::s_minDuration };
+	int maxd{ Video::s_maxDuration };
 
-	std::vector<bool> alreadyRead{8, false};
+	std::vector<bool> alreadyRead(8U, false);
 
 	for (const auto& kwP : t_params) {
 		const auto& param{ *kwP.first};
@@ -396,6 +401,7 @@ void VideoDataHolder::action_search(const Parameters& t_params) {
 				minr = std::stof(*args[0]);
 			}
 			catch (std::invalid_argument& e) {
+				e;
 				minr = Video::s_minRating;
 			}
 			alreadyRead[4] = true;
@@ -405,24 +411,27 @@ void VideoDataHolder::action_search(const Parameters& t_params) {
 				maxr = std::stof(*args[0]);
 			}
 			catch (std::invalid_argument& e) {
+				e;
 				maxr = Video::s_maxRating;
 			}
 			alreadyRead[5] = true;
 		}
 		else if (!alreadyRead[6] && param == m_params_search.m_minduration) {
 			try {
-				mind = std::stof(*args[0]);
+				mind = std::stoi(*args[0]);
 			}
 			catch (std::invalid_argument& e) {
+				e;
 				mind = Video::s_minDuration;
 			}
 			alreadyRead[6] = true;
 		}
 		else if (!alreadyRead[7] && param == m_params_search.m_maxduration) {
 			try {
-				maxd = std::stof(*args[0]);
+				maxd = std::stoi(*args[0]);
 			}
 			catch (std::invalid_argument& e) {
+				e;
 				maxd = Video::s_maxDuration;
 			}
 			alreadyRead[7] = true;
@@ -432,7 +441,7 @@ void VideoDataHolder::action_search(const Parameters& t_params) {
 
 	if (minr < Video::s_minRating) { minr = Video::s_minRating; }
 	if (maxr > Video::s_maxRating) { maxr = Video::s_maxRating; }
-	if (mind < Video::s_minRating) { minr = Video::s_minDuration; }
+	if (mind < Video::s_minRating) { mind = Video::s_minDuration; }
 	if (maxd > Video::s_maxDuration) { maxd = Video::s_maxDuration; }
 
 	VideoDataHolder::filterVideos((m_buffer.empty() ? m_videosVec : m_buffer), *name, *id, *genre, *series, { minr, maxr }, {mind, maxd});
@@ -460,6 +469,7 @@ void VideoDataHolder::action_rate(const Parameters& t_params) {
 				alreadyRead[1] = true;
 			}
 			catch (std::invalid_argument& e) {
+				e;
 				rating = Video::s_minRating;
 				isRatingValid = false;
 
@@ -481,7 +491,7 @@ void VideoDataHolder::action_rate(const Parameters& t_params) {
 void VideoDataHolder::action_sort(const Parameters& t_params){
 	
 	SortMemo sortCriteria;
-	std::vector<bool> alreadyRead{8, false};
+	std::vector<bool> alreadyRead(8U, false);
 
 	for (const auto& kwP : t_params) {
 		const auto& param{ *kwP.first };
@@ -631,6 +641,8 @@ VideosVec& VideoDataHolder::sortVideosBy(const VideosVec& t_inVideos, VideosVec&
 					return isDescending ? c : !c; 
 				}
 			}
+			throw std::runtime_error("Could not resolve comparison for videos.\n");
+			return false;
 		}
 	};
 

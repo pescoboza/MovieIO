@@ -8,7 +8,7 @@
 #include <map>
 #include <memory>
 #include <unordered_map>
-#include <functional>
+#include <unordered_set>
 #include <string>
 #include <vector>
 
@@ -28,7 +28,7 @@ using ActionStrMap = std::multimap<std::string, ActionBindings>;
 using ActionPtr = std::unique_ptr<Action>;
 using ActionMap = std::unordered_map<ActionBindings, ActionPtr>;
 using NumArgs = unsigned;
-using CmdParamsMap = std::unordered_map<std::reference_wrapper<const std::string>, NumArgs>;
+using CmdParamsMap = std::unordered_map<std::string, NumArgs>;
 using CmdsMap = std::unordered_map<ActionBindings, CmdParamsMap>;
 using PtrToConstStrVec = std::vector<const std::string*>;
 using Parameters = std::vector<std::pair<const std::string*, PtrToConstStrVec>>;
