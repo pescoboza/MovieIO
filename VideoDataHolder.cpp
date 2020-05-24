@@ -129,6 +129,11 @@ VideoDataHolder::VideoDataHolder(std::ostream& t_out, std::istream& t_in) :
 		
 		cmds.emplace(ActionBindings::RATE, std::move(params));
 
+		// Commands with no extra parameters
+		cmds.emplace(ActionBindings::CLEAR, CmdParamsMap{});
+		cmds.emplace(ActionBindings::HELP,  CmdParamsMap{});
+		cmds.emplace(ActionBindings::QUIT,  CmdParamsMap{});
+
 		return std::move(cmds);
 	}() }
 {}
@@ -274,6 +279,8 @@ void VideoDataHolder::start(){
 			m_out << s_msg_unknownCmdErr << std::endl;
 			continue;
 		}
+
+		executeAction(actionPair.first, params);
 	}
 
 }
