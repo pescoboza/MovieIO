@@ -171,12 +171,12 @@ private:
 	static bool isLesser(SortCriteria t_criterion, const Video& t_a, const Video& t_b);
 	static bool isEqual(SortCriteria t_criterion, const Video& t_a, const Video& t_b);
 	
-	void action_search(const CmdParamsMemo& t_memo);
-	void actoin_rate(const CmdParamsMemo& t_memo);
-	void action_sort(const CmdParamsMemo& t_memo);
-	void action_clear(const CmdParamsMemo& t_memo = {});
-	void action_help(const CmdParamsMemo& t_memo = {});
-	void action_quit(const CmdParamsMemo& t_memo = {});
+	void action_search(const Parameters& t_params);
+	void action_rate(const Parameters& t_params);
+	void action_sort(const Parameters& t_params);
+	void action_clear(const Parameters& t_params = {});
+	void action_help(const Parameters& t_params = {});
+	void action_quit(const Parameters& t_params = {});
 };
 
 template<typename Functor>

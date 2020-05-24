@@ -359,7 +359,7 @@ bool VideoDataHolder::isEqual(SortCriteria t_criterion, const Video& t_a, const 
 	}
 }
 
-void VideoDataHolder::action_search(const CmdParamsMemo& t_memo) {
+void VideoDataHolder::action_search(const Parameters& t_params) {
 	const std::string* name{ &utl::emptyStr };
 	const std::string* id{ &utl::emptyStr };
 	const std::string* genre{ &utl::emptyStr };
@@ -371,8 +371,8 @@ void VideoDataHolder::action_search(const CmdParamsMemo& t_memo) {
 
 	std::vector<bool> alreadyRead{8, false};
 
-	for (const auto& kwP : t_memo) {
-		const auto& param{ kwP.first.get() };
+	for (const auto& kwP : t_params) {
+		const auto& param{ *kwP.first};
 		const auto& args{ kwP.second };
 
 		if (!alreadyRead[0] && param == m_params_search.m_name) {
@@ -438,15 +438,15 @@ void VideoDataHolder::action_search(const CmdParamsMemo& t_memo) {
 	VideoDataHolder::filterVideos((m_buffer.empty() ? m_videosVec : m_buffer), *name, *id, *genre, *series, { minr, maxr }, {mind, maxd});
 }
 
-void VideoDataHolder::actoin_rate(const CmdParamsMemo& t_memo) {
+void VideoDataHolder::action_rate(const Parameters& t_params) {
 	const std::string* id{ &utl::emptyStr };
 	float rating{ Video::s_minRating };
 	bool isRatingValid{ false };
 	
 	bool alreadyRead[2] = { false, false };
 	
-	for (const auto& kwP : t_memo) {
-		const auto& param{ kwP.first.get() };
+	for (const auto& kwP : t_params) {
+		const auto& param{ *kwP.first};
 		const auto& args{ kwP.second };	
 
 		if (!alreadyRead[0] && param == m_params_rate.m_id) {
@@ -478,13 +478,13 @@ void VideoDataHolder::actoin_rate(const CmdParamsMemo& t_memo) {
 		videoIt->second->rate(rating);
 	}	
 }
-void VideoDataHolder::action_sort(const CmdParamsMemo& t_memo){
+void VideoDataHolder::action_sort(const Parameters& t_params){
 	
 	SortMemo sortCriteria;
 	std::vector<bool> alreadyRead{8, false};
 
-	for (const auto& kwP : t_memo) {
-		const auto& param{ kwP.first.get() };
+	for (const auto& kwP : t_params) {
+		const auto& param{ *kwP.first };
 		const auto& args{ kwP.second };
 		
 		bool isDescending{ m_params_sort.m_descending.find(*args[0]) != m_params_sort.m_descending.cend()};
@@ -511,7 +511,7 @@ void VideoDataHolder::action_sort(const CmdParamsMemo& t_memo){
 	sortVideosBy((m_buffer.empty() ? m_videosVec : m_buffer), m_buffer, sortCriteria);
 }
 
-void VideoDataHolder::action_clear(const CmdParamsMemo& t_memo){
+void VideoDataHolder::action_clear(const Parameters& t_params){
 #if defined( __WIN32__) || defined(_WIN32) || defined(__CYGWIN32__)
 	std::system("cls");
 #else
@@ -519,11 +519,11 @@ void VideoDataHolder::action_clear(const CmdParamsMemo& t_memo){
 #endif // WIN32
 }
 
-void VideoDataHolder::action_help(const CmdParamsMemo& t_memo){
+void VideoDataHolder::action_help(const Parameters& t_params){
 	m_out << s_helpMsg << std::endl;
 }
 
-void VideoDataHolder::action_quit(const CmdParamsMemo& t_memo){
+void VideoDataHolder::action_quit(const Parameters& t_params){
 	std::exit(0);
 }
 
