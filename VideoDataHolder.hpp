@@ -90,10 +90,12 @@ class VideoDataHolder {
 	std::ostream& m_out;
 	std::istream& m_in;
 
-	static const std::string s_startScreen;
-	static const std::string s_unkownCmdErrMsg;
-	static const std::string s_helpMsg;
-	static const std::string s_notFoundErr;
+	
+	static const std::string s_msg_loading;
+	static const std::string s_msg_startScreen;
+	static const std::string s_msg_unknownCmdErr;
+	static const std::string s_msg_help;
+	static const std::string s_msg_notFoundErr;
 
 public:
 	VideoDataHolder(std::ostream& t_out = std::cout , std::istream& t_in = std::cin);

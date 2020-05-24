@@ -55,17 +55,13 @@ namespace debug {
 }
 #endif // _DEBUG
 
-const std::string VideoDataHolder::s_initMsg{
-R"(Usage)"
-};
-
-const std::string VideoDataHolder::s_notFoundErr{ "ERROR: Could not find a result for the given query." };
-const std::string VideoDataHolder::s_helpMsg{ 
+const std::string VideoDataHolder::s_msg_loading{"Loading data..."};
+const std::string VideoDataHolder::s_msg_notFoundErr{ "ERROR: Could not find a result for the given query." };
+const std::string VideoDataHolder::s_msg_help{ 
 	R"(Help)" 
 };
-
-const std::string VideoDataHolder::s_unkownCmdErrMsg{ "Err" };
-const std::string VideoDataHolder::s_startScreen{ "SC" };
+const std::string VideoDataHolder::s_msg_unknownCmdErr{ "Err" };
+const std::string VideoDataHolder::s_msg_startScreen{ "SC" };
 
 VideoDataHolder::VideoDataHolder(std::ostream& t_out, std::istream& t_in) :
 	m_out{ t_out },
@@ -136,6 +132,7 @@ VideoDataHolder::VideoDataHolder(std::ostream& t_out, std::istream& t_in) :
 {}
 
 void VideoDataHolder::parseInfoFromFile(const std::string& t_filename){
+	m_out << s_msg_loading << std::endl;
 	std::ifstream file;
 	file.open(t_filename);
 	if (!file.is_open()) {
@@ -255,7 +252,7 @@ void VideoDataHolder::executeAction(ActionBindings t_action, const Parameters& t
 void VideoDataHolder::start(){
 	
 	// Print out start screen
-	m_out << s_startScreen;
+	m_out << s_msg_startScreen;
 
 	// Main application loop
 	while (true) {
@@ -271,7 +268,7 @@ void VideoDataHolder::start(){
 		if (!actionPair.second) {
 			
 			// Print error messsage continue
-			m_out << s_unkownCmdErrMsg << std::endl;
+			m_out << s_msg_unknownCmdErr << std::endl;
 			continue;
 		}
 	}
@@ -445,6 +442,7 @@ void VideoDataHolder::action_search(const Parameters& t_params) {
 	if (maxd > Video::s_maxDuration) { maxd = Video::s_maxDuration; }
 
 	VideoDataHolder::filterVideos((m_buffer.empty() ? m_videosVec : m_buffer), *name, *id, *genre, *series, { minr, maxr }, {mind, maxd});
+	printVideos(m_buffer, 0U, true, m_out);
 }
 
 void VideoDataHolder::action_rate(const Parameters& t_params) {
@@ -479,7 +477,7 @@ void VideoDataHolder::action_rate(const Parameters& t_params) {
 	
 	auto videoIt{ m_videosById.find(*id) };
 	if (videoIt == m_videosById.end()) {
-		m_out << s_notFoundErr << std::endl;
+		m_out << s_msg_notFoundErr << std::endl;
 	}
 	else if (!isRatingValid) {
 		m_out << m_params_rate.m_err_rating << std::endl;
@@ -519,6 +517,7 @@ void VideoDataHolder::action_sort(const Parameters& t_params){
 	}
 
 	sortVideosBy((m_buffer.empty() ? m_videosVec : m_buffer), m_buffer, sortCriteria);
+	printVideos(m_buffer, 0U, true, m_out);
 }
 
 void VideoDataHolder::action_clear(const Parameters& t_params){
@@ -530,7 +529,7 @@ void VideoDataHolder::action_clear(const Parameters& t_params){
 }
 
 void VideoDataHolder::action_help(const Parameters& t_params){
-	m_out << s_helpMsg << std::endl;
+	m_out << s_msg_help << std::endl;
 }
 
 void VideoDataHolder::action_quit(const Parameters& t_params){
