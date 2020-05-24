@@ -476,9 +476,35 @@ void VideoDataHolder::actoin_rate(const CmdParamsMemo& t_memo) {
 }
 void VideoDataHolder::action_sort(const CmdParamsMemo& t_memo){
 	
-	const std::string* sortValue{&m_para};
-	bool descending{ false };
+	SortMemo sortCriteria;
+	std::vector<bool> alreadyRead{8, false};
+
+	for (const auto& kwP : t_memo) {
+		const auto& param{ kwP.first.get() };
+		const auto& args{ kwP.second };
 		
+		bool isDescending{ m_params_sort.m_descending.find(*args[0]) != m_params_sort.m_descending.cend()};
+
+
+		if (!alreadyRead[0] && param == m_params_sort.m_name) {
+			sortCriteria.emplace_back(SortCriteria::NAME, isDescending);
+			alreadyRead[0] = true;
+		}
+		else if (!alreadyRead[1] && param == m_params_sort.m_id) {
+			sortCriteria.emplace_back(SortCriteria::ID, isDescending);
+			alreadyRead[1] = true;
+		}
+		else if (!alreadyRead[2] && param == m_params_sort.m_rating) {
+			sortCriteria.emplace_back(SortCriteria::RATING, isDescending);
+			alreadyRead[2] = true;
+		}
+		else if (!alreadyRead[3] && param == m_params_sort.m_duration) {
+			sortCriteria.emplace_back(SortCriteria::DURATION, isDescending);
+			alreadyRead[3] = true;
+		}
+	}
+
+	sortVideosBy(m_buffer.empty() ? m_videosVec : m_buffer, m_buffer, sortCriteria);
 }
 
 void VideoDataHolder::action_clear(const CmdParamsMemo& t_memo){

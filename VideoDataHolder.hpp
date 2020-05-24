@@ -150,10 +150,12 @@ private:
 	}m_params_search;
 
 	struct ParametersSort {
-		const std::string m_name{ "name+" };
+		const std::string m_name{ "name" };
 		const std::string m_id{ "id" };
 		const std::string m_rating{ "rating" };
 		const std::string m_duration{ "duration" };
+		const std::unordered_set<std::string> m_ascending{ "ascending", "+", "asc", "true", "1" };
+		const std::unordered_set<std::string> m_descending{ "descending", "-", "des", "false", "0" };
 	}m_params_sort;
 
 	struct ParametersRate {
