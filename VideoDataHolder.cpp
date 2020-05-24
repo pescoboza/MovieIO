@@ -62,8 +62,9 @@ R"(Usage)"
 const std::string VideoDataHolder::s_unkownCmdErrMsg{ "Err" };
 const std::string VideoDataHolder::s_startScreen{ "SC" };
 
-VideoDataHolder::VideoDataHolder(std::ostream& t_out) :
+VideoDataHolder::VideoDataHolder(std::ostream& t_out, std::istream& t_in) :
 	m_out{ t_out },
+	m_in{t_in},
 	m_videosById{},
 	m_buffer{},
 	m_movies{}, 
@@ -186,86 +187,61 @@ void VideoDataHolder::parseInfoFromFile(const std::string& t_filename){
 	}
 }
 
-void VideoDataHolder::start(std::ostream& t_out, std::istream& t_in){
-	bool isQuit{ false };
-	while (!isQuit) {
-		t_out << s_startScreen;
+std::pair<ActionBindings, bool> VideoDataHolder::structureCommand(const StrVec& t_words, Parameters& t_outParams) {
+	
+	// The first word is the action selected
+	auto cmdPair{VideoDataHolder::strToActionBinding(t_words[0])};
+	
+	// Validate the command selsection
+	if (!cmdPair.second) { return { ActionBindings{}, false }; }
+
+	const auto& action{ cmdPair.first }; // Action corresponding to first word
+	const auto& paramsMap{ m_cmds.at(action) }; // The parameters map of said action
+
+	// Iterate through the words (starting from the second one)
+	for (auto wIt{++t_words.cbegin()}; wIt != t_words.cend (); wIt++) {
+		// Look for any parameter keyword
+		const auto& word{*wIt};
+		auto pIt{paramsMap.find(word)};
+		
+		// Check it the word is a parameter keyword
+		if (pIt != paramsMap.cend()) {
+			
+			// Add the parameter selected
+			t_outParams.emplace_back(&*wIt, PtrToConstStrVec{} );
+			auto &pArgsIt{t_outParams.back().second};
+
+			// For each arg required, advance the word interator and remmeber the word
+			for (unsigned i{ 0U }; i < pIt->second; i++) {
+				wIt++;
+				pArgsIt.push_back(&*wIt);
+			}
+		}
+	}
+	return {action, true};
+}
+
+void VideoDataHolder::start(std::istream& t_in){
+	
+
+	m_out << s_startScreen;
+
+	while (true) {
 		
 		// Get the command that the user entered
 		auto words{ utl::getWords(input()) };	
-		auto actionPair{ strToActionBinding(words[0]) };
-
-		// Splash an error screen if no command is recognized or if no parameters are given
-		if (!actionPair.second || words.size() == 1U) {
-			t_out << s_unkownCmdErrMsg << std::endl;
+		
+		// Build the command from the words
+		Parameters params;
+		auto actionPair{ structureCommand(words, params) };
+		
+		// Validate if the command exists (first word)
+		if (!actionPair.second) {
+			
+			// Print error messsage continue
+			m_out << s_unkownCmdErrMsg << std::endl;
 			continue;
 		}
-
-		// Look for keywords of parameters of the entered command
-		auto action = actionPair.first;
-		auto cmdIt{ m_cmds.find(action) };
-
-		// Store the parameter and its arguments
-		CmdParamsMemo paramsMemo;
-
-		// If the command exists, but its not in the map, it means it does not need any additional parameters
-		if (cmdIt != m_cmds.cend()) {
-			auto& paramsMap{cmdIt->second};
-
-			bool isUnknownKeyword{ false };
-
-			// Iterate through the words
-			for (auto it{ ++words.cbegin() }; it != words.cend();) {
-				const auto& word{ *it };
-
-				auto keywordIt{ paramsMap.find(word) };
-
-				// Check if the word is a keyword, else break and remember to splash error
-				if (keywordIt == paramsMap.cend()) {
-					isUnknownKeyword = true;
-					break;
-				}
-
-				// Remember the new emplaced parameter
-				auto& paramArgs{ paramsMemo.emplace(*it, PtrToConstStrVec{}).first->second};
-				paramArgs.reserve(keywordIt->second);
-				
-				// Capture the number of args needed for the keyword
-				for (unsigned i{ 0 }; i < keywordIt->second; i++) {
-					it++;
-					paramArgs.push_back(&*it);
-				}
-
-				// Go to the next keyword
-				it++;
-			}
-		}
-
-
-		// We have collected the keywords and parameters for the command
-		// We now pass them to the callback assigned to the command function
-
-		switch (action)
-		{
-		case ActionBindings::SEARCH:
-			break;
-		case ActionBindings::RATE:
-			break;
-		case ActionBindings::SORT:
-			break;
-		case ActionBindings::CLEAR:
-			break;
-		case ActionBindings::HELP:
-			break;
-		case ActionBindings::QUIT:
-			break;
-		default:
-			break;
-		}
-
-		m_actionBindings
-		paramsMemo
-
 	}
 }
 
@@ -431,7 +407,7 @@ void VideoDataHolder::action_search(const CmdParamsMemo& t_memo) {
 	if (mind < Video::s_minRating) { minr = Video::s_minDuration; }
 	if (maxd > Video::s_maxDuration) { maxd = Video::s_maxDuration; }
 
-	VideoDataHolder::filterVideos(m_buffer, *name, *id, *genre, *series, { minr, maxr }, {mind, maxd});
+	VideoDataHolder::filterVideos((m_buffer.empty() ? m_videosVec : m_buffer), *name, *id, *genre, *series, { minr, maxr }, {mind, maxd});
 }
 
 void VideoDataHolder::actoin_rate(const CmdParamsMemo& t_memo) {
@@ -504,7 +480,7 @@ void VideoDataHolder::action_sort(const CmdParamsMemo& t_memo){
 		}
 	}
 
-	sortVideosBy(m_buffer.empty() ? m_videosVec : m_buffer, m_buffer, sortCriteria);
+	sortVideosBy((m_buffer.empty() ? m_videosVec : m_buffer), m_buffer, sortCriteria);
 }
 
 void VideoDataHolder::action_clear(const CmdParamsMemo& t_memo){

@@ -28,11 +28,12 @@ using ActionStrMap = std::multimap<std::string, ActionBindings>;
 using ActionPtr = std::unique_ptr<Action>;
 using ActionMap = std::unordered_map<ActionBindings, ActionPtr>;
 using NumArgs = unsigned;
-using CmdParamsMap = std::unordered_map<std::reference_wrapper<std::string>, NumArgs>;
+using CmdParamsMap = std::unordered_map<std::reference_wrapper<const std::string>, NumArgs>;
 using CmdsMap = std::unordered_map<ActionBindings, CmdParamsMap>;
 using PtrToConstStrVec = std::vector<const std::string*>;
-using CmdParamsMemo = std::unordered_map<std::reference_wrapper<std::string>, PtrToConstStrVec>;
+using Parameters = std::vector<std::pair<const std::string*, PtrToConstStrVec>>;
 using SortMemo = std::vector<std::pair<SortCriteria, bool>>; // true -> descending, false -> descending
+using StrVec = std::vector<std::string>;
 
 enum class SearchCategories {
 	NAME,
@@ -87,6 +88,7 @@ class VideoDataHolder {
 	CmdsMap m_cmds;
 
 	std::ostream& m_out;
+	std::istream& m_in;
 
 	static const std::string s_startScreen;
 	static const std::string s_unkownCmdErrMsg;
@@ -94,8 +96,9 @@ class VideoDataHolder {
 	static const std::string s_notFoundErr;
 
 public:
-	VideoDataHolder(std::ostream& t_out = std::cout);
+	VideoDataHolder(std::ostream& t_out = std::cout , std::istream& t_in = std::cin);
 	void parseInfoFromFile(const std::string& t_filename);
+	std::pair<ActionBindings,bool> structureCommand(const StrVec& t_words, Parameters& t_outParams);
 	void start(std::ostream& t_out = std::cout, std::istream& t_in = std::cin);
 
 
