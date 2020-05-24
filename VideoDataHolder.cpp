@@ -60,8 +60,10 @@ const std::string VideoDataHolder::s_msg_notFoundErr{ "ERROR: Could not find a r
 const std::string VideoDataHolder::s_msg_help{ 
 	R"(Help)" 
 };
-const std::string VideoDataHolder::s_msg_unknownCmdErr{ "Err" };
-const std::string VideoDataHolder::s_msg_startScreen{ "SC" };
+const std::string VideoDataHolder::s_msg_unknownCmdErr{ "[UNKNOWN COMMAND ERROR]" };
+const std::string VideoDataHolder::s_msg_startScreen{ "[START SCREEN]" };
+const std::string VideoDataHolder::s_msg_enterCmd{"> "};
+
 
 VideoDataHolder::VideoDataHolder(std::ostream& t_out, std::istream& t_in) :
 	m_out{ t_out },
@@ -252,12 +254,13 @@ void VideoDataHolder::executeAction(ActionBindings t_action, const Parameters& t
 void VideoDataHolder::start(){
 	
 	// Print out start screen
-	m_out << s_msg_startScreen;
+	m_out << s_msg_startScreen << std::endl;;
 
 	// Main application loop
 	while (true) {
 		
 		// Get the command that the user entered
+		m_out << s_msg_enterCmd;
 		auto words{ utl::getWords(input()) };	
 		
 		// Build the command from the words
@@ -323,7 +326,7 @@ std::string VideoDataHolder::input(){
 
 std::pair<ActionBindings, bool> VideoDataHolder::strToActionBinding(const std::string& t_cmdName) const{
 	auto it(m_actions.find(t_cmdName));
-	if (it != m_actions.end()) {
+	if (it == m_actions.end()) {
 		return { ActionBindings{}, false };
 	}
 	return { it->second, true };

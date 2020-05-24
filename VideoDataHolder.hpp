@@ -96,6 +96,7 @@ class VideoDataHolder {
 	static const std::string s_msg_unknownCmdErr;
 	static const std::string s_msg_help;
 	static const std::string s_msg_notFoundErr;
+	static const std::string s_msg_enterCmd;
 
 public:
 	VideoDataHolder(std::ostream& t_out = std::cout , std::istream& t_in = std::cin);
