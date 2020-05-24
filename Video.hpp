@@ -43,6 +43,7 @@ protected:
 	Genre m_genre;
 	VideoType m_type;
 	Ratings m_ratings;
+	float m_avgRating;
 
 	static const struct TableParams{
 		unsigned m_id;
@@ -67,12 +68,14 @@ protected:
 
 public:
 	const std::string& getName() const;
+	void calcRating();
 	float getRating() const;
 	const std::string& getId()const;
 	Genre getGenre() const;
 	VideoType getType() const;
 	unsigned getDuration() const;
 	void rate(float t_rating);
+	void rate(const std::vector<float>& t_ratings);
 	std::string formattedDuration() const;
 
 	static void printTableHeader(std::ostream& t_out = std::cout);

@@ -294,7 +294,7 @@ VideoDataHolder& VideoDataHolder::addEpisode(const std::string& t_name, const st
 	if (video == nullptr) {	throw std::runtime_error("Could not retrieve inserted video.\n");}
 
 	// Add ratings to video
-	for (const auto& r : t_ratings) { video->rate(r) ; }
+	video->rate(t_ratings);
 
 	registerVideo(video);
 	return *this;
@@ -309,7 +309,7 @@ VideoDataHolder& VideoDataHolder::addMovie(const std::string& t_name, const std:
 	Video* movie{ m_movies.back().get() };
 
 	// Add ratings to video
-	for (const auto& r : t_ratings) {movie->rate(r);}
+	movie->rate(t_ratings);
 	
 	registerVideo(movie);
 	return *this;

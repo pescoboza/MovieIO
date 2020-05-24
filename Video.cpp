@@ -42,20 +42,28 @@ const VideoTypeMap Video::s_videoTypesStrings{
 	{"episode", VideoType::SERIES_EPISODE}
 };
 
-Video::Video(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre, VideoType t_type):
-	m_name{ t_name }, m_id{ t_id }, m_duration{ t_duration }, m_genre{ t_genre }, m_type{t_type}{}
+Video::Video(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre, VideoType t_type) :
+	m_name{ t_name },
+	m_id{ t_id },
+	m_duration{ t_duration },
+	m_genre{ t_genre },
+	m_type{ t_type },
+	m_ratings{},
+	m_avgRating{0.f}{}
 
 const std::string& Video::getName() const { return m_name; }
 
-float Video::getRating() const {
+void Video::calcRating() {
 	float accRating{ 0.f };
 	int size{ 0 };
 	for (const auto& rating : m_ratings) {
 		accRating += rating;
 		size++;
 	}
-	return size != 0 ? accRating / size : 0;
+	m_avgRating = size != 0 ? accRating / size : 0;
 }
+
+float Video::getRating() const { return m_avgRating; }
 
 const std::string& Video::getId() const { return m_id; }
 
@@ -65,7 +73,17 @@ unsigned Video::getDuration() const {return m_duration;}
 
 Genre Video::getGenre() const { return m_genre; }
 
-void Video::rate(float t_rating) { m_ratings.emplace_back(t_rating); }
+void Video::rate(float t_rating) { 
+	m_ratings.emplace_back(t_rating); 
+	calcRating();
+}
+
+void Video::rate(const std::vector<float>& t_ratings){
+	for (const auto& r : t_ratings) {
+		m_ratings.emplace_back(r);
+	}
+	calcRating();
+}
 
 std::string Video::formattedDuration() const{
 	unsigned minutes{ m_duration / 60 };
