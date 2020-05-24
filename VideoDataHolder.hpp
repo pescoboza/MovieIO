@@ -99,7 +99,8 @@ public:
 	VideoDataHolder(std::ostream& t_out = std::cout , std::istream& t_in = std::cin);
 	void parseInfoFromFile(const std::string& t_filename);
 	std::pair<ActionBindings,bool> structureCommand(const StrVec& t_words, Parameters& t_outParams);
-	void start(std::ostream& t_out = std::cout, std::istream& t_in = std::cin);
+	void executeAction(ActionBindings t_action, const Parameters& t_params);
+	void start();
 
 
 	const Video* getVideoById(const std::string& t_videoId) const; // Returns nullptr if video is not found
@@ -137,7 +138,7 @@ private:
 	VideoDataHolder& addEpisode(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre, const std::string& t_series, unsigned t_season, unsigned t_episodeNum, const Ratings& t_ratings = {});
 	VideoDataHolder& addMovie(const std::string& t_name, const std::string& t_id, unsigned t_duration, Genre t_genre, const Ratings& t_ratings = {});
 
-	static std::string input(std::istream& t_in = std::cin);
+	std::string input();
 	std::pair<ActionBindings, bool> strToActionBinding(const std::string& t_input) const;
 
 

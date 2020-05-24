@@ -221,11 +221,38 @@ std::pair<ActionBindings, bool> VideoDataHolder::structureCommand(const StrVec& 
 	return {action, true};
 }
 
-void VideoDataHolder::start(std::istream& t_in){
-	
+void VideoDataHolder::executeAction(ActionBindings t_action, const Parameters& t_params){
+	switch (t_action)
+	{
+	case ActionBindings::SEARCH:
+		action_search(t_params);
+		break;
+	case ActionBindings::RATE:
+		action_rate(t_params);
+		break;
+	case ActionBindings::SORT:
+		action_sort(t_params);
+		break;
+	case ActionBindings::CLEAR:
+		action_clear();
+		break;
+	case ActionBindings::HELP:
+		action_help();
+		break;
+	case ActionBindings::QUIT:
+		action_quit();
+		break;
+	default:
+		break;
+	}
+}
 
+void VideoDataHolder::start(){
+	
+	// Print out start screen
 	m_out << s_startScreen;
 
+	// Main application loop
 	while (true) {
 		
 		// Get the command that the user entered
@@ -243,6 +270,7 @@ void VideoDataHolder::start(std::istream& t_in){
 			continue;
 		}
 	}
+
 }
 
 void VideoDataHolder::registerVideo(Video* t_video){
@@ -285,9 +313,9 @@ VideoDataHolder& VideoDataHolder::addMovie(const std::string& t_name, const std:
 	return *this;
 }
 
-std::string VideoDataHolder::input(std::istream& t_in){
+std::string VideoDataHolder::input(){
 	std::string str{""};
-	std::getline(t_in, str);
+	std::getline(m_in, str);
 	return str;
 }
 
