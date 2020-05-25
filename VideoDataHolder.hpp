@@ -121,7 +121,9 @@ public:
 
 	static void printVideos(const VideosVec& t_videos, unsigned t_numEntries, bool t_printHeader = true, std::ostream& t_out = std::cout);
 
-	VideosVec& filterVideos(VideosVec& t_outVideos,
+	VideosVec& filterVideos(
+		const VideosVec& t_inVideos,
+		VideosVec& t_outVideos,
 		const std::string& t_name = "",
 		const std::string& t_id = "",
 		const std::string& t_genre = "",
@@ -184,9 +186,20 @@ private:
 
 template<typename Functor>
 inline VideosVec& VideoDataHolder::filter(Functor t_filter, const VideosVec& t_inVideos, VideosVec& t_outVideos){
-	for (const auto vidPtr : t_inVideos) {
-		const auto& constVid = *vidPtr;
-		if (t_filter(constVid)) {
+#ifdef _DEBUG
+	int counter{ 0 };
+#endif // _DEBUG
+	for (Video* vidPtr : t_inVideos) {
+		if (!vidPtr) {
+			throw std::runtime_error{ "Invalid video pointer.\n" };
+		}
+#ifdef _DEBUG
+		auto val{vidPtr->getDuration()};
+		counter++;
+#endif // _DEBUG
+
+
+		if (t_filter(*vidPtr)) {
 			t_outVideos.push_back(vidPtr);
 		}
 	}

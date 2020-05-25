@@ -425,7 +425,7 @@ void VideoDataHolder::action_search(const Parameters& t_params) {
 		}
 		else if (!alreadyRead[6] && param == m_params_search.m_minduration) {
 			try {
-				mind = std::stoi(*args[0]);
+				mind = std::stoi(*args[0]) * 60; // minutes -> seconds
 			}
 			catch (std::invalid_argument& e) {
 				e;
@@ -435,7 +435,7 @@ void VideoDataHolder::action_search(const Parameters& t_params) {
 		}
 		else if (!alreadyRead[7] && param == m_params_search.m_maxduration) {
 			try {
-				maxd = std::stoi(*args[0]);
+				maxd = std::stoi(*args[0]) * 60; // minutes -> seconds
 			}
 			catch (std::invalid_argument& e) {
 				e;
@@ -451,7 +451,7 @@ void VideoDataHolder::action_search(const Parameters& t_params) {
 	if (mind < Video::s_minRating) { mind = Video::s_minDuration; }
 	if (maxd > Video::s_maxDuration) { maxd = Video::s_maxDuration; }
 
-	VideoDataHolder::filterVideos((m_buffer.empty() ? m_videosVec : m_buffer), *name, *id, *genre, *series, { minr, maxr }, {mind, maxd});
+	VideoDataHolder::filterVideos((m_buffer.empty() ? m_videosVec : m_buffer), m_buffer,*name, *id, *genre, *series, { minr, maxr }, {mind, maxd});
 	printVideos(m_buffer, 0U, true, m_out);
 }
 
@@ -531,6 +531,7 @@ void VideoDataHolder::action_sort(const Parameters& t_params){
 }
 
 void VideoDataHolder::action_clear(const Parameters& t_params){
+	m_buffer.clear();
 #if defined( __WIN32__) || defined(_WIN32) || defined(__CYGWIN32__)
 	std::system("cls");
 #else
@@ -590,8 +591,8 @@ void VideoDataHolder::printVideos(const VideosVec& t_videos, unsigned t_numEntri
 	}
 }
 
-VideosVec& VideoDataHolder::filterVideos(VideosVec& t_outVideos, const std::string& t_name, const std::string& t_id, const std::string& t_genre, const std::string& t_series, const std::pair<float, float>& t_rating, const std::pair<int ,int>& t_duration) const{
-
+VideosVec& VideoDataHolder::filterVideos(const VideosVec& t_inVideos, VideosVec& t_outVideos, const std::string& t_name, const std::string& t_id, const std::string& t_genre, const std::string& t_series, const std::pair<float, float>& t_rating, const std::pair<int ,int>& t_duration) const{
+	
 	auto filterFunction{ [&](const Video& t_video) {
 		
 		// Check name matches
@@ -625,7 +626,16 @@ VideosVec& VideoDataHolder::filterVideos(VideosVec& t_outVideos, const std::stri
 		return true;
 	}};
 
-	filter(filterFunction, m_videosVec, t_outVideos);
+
+	if (&t_inVideos == &t_outVideos) {
+		auto inCopy{t_inVideos};
+		t_outVideos.clear();
+		filter(filterFunction, inCopy, t_outVideos);
+	}
+	else {
+		filter(filterFunction, t_inVideos, t_outVideos);
+	}
+	
 	return t_outVideos;
 }
 
