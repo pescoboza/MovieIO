@@ -61,8 +61,37 @@ const std::string VideoDataHolder::s_msg_help{
 	R"(Help)" 
 };
 const std::string VideoDataHolder::s_msg_unknownCmdErr{ "[UNKNOWN COMMAND ERROR]" };
-const std::string VideoDataHolder::s_msg_startScreen{ "[START SCREEN]" };
-const std::string VideoDataHolder::s_msg_enterCmd{"> "};
+const std::string VideoDataHolder::s_msg_startScreen{ 
+R"(
++--------------------------------------------------------------------------------------------------------+
+|                                                                                                        |
+|                                                                                                        |
+|                                                                                                        |
+|                                                                                                        |
+|                                                                                                        |
+|        @@@@@@@    @@@@@@@                                                           ###                |
+|         @@@@@@@  @@@@@@@       %@@.                      @@@@@@@@@@@@@@@       @@@@@@@@@@@@@           |
+|         @@@@@@@/%@@@@@@@    @@@@@@@@@@   (@@@@@@  @@@/        &@@@@          @@@@@*     @@@@@@         |
+|         @@@@@@@@@@@@@@@@   @@@@@ #@@@@@   @@@@@@  @@&         &@@@@         @@@@@        .@@@@,        |
+|         @@@@@@@@@@@@@@@@  @@@@@@ #@@@@@@   @@@@@,@@@          &@@@@         @@@@#         @@@@@        |
+|         @@@@@@@@@&@@@@@@  @@@@@@ #@@@@@@   @@@@@@@@@          &@@@@         @@@@.         @@@@@        |
+|         @@@ @@@@,&@@@@@@  @@@@@@ #@@@@@@    @@@@@@@           &@@@@         @@@@%         @@@@@        |
+|         @@@  @@@ &@@@@@@  @@@@@@ #@@@@@%    @@@@@@@           &@@@@         @@@@@        (@@@@         |
+|         @@@      &@@@@@@   @@@@@ #@@@@@      @@@@@            &@@@@          @@@@@@     @@@@@          |
+|        @@@@@,   @@@@@@@@@   @@@@@@@@@.       @@@@@       @@@@@@@@@@@@@@@       @@@@@@@@@@@@            |
+|              XXXXXXXXXXXXXXX                                               XXXXXXXXXXX XXX             |
+|          XXXXXX        XXXXXXXXXXXXXXX                            XXXXXXXXXXXX                         |
+|        XXXXX                    XXXXXXXXXXXXXXXXXXXXXXXXXXXX XXXXXXXX                                  |
+|       XXXX                               XXXXXXXXXXXXXXXXXXXXXXX                                       |
+|                                                                                                        |
+|                                                                                                        |
+|           +-------------------------------------------------------------------------------+            |
+|           |             Command line movie rating system by Pedro Escoboza                |            |
+|           +-------------------------------------------------------------------------------+            |
+|                                                                                                        |
+|                                                                                                        |
++--------------------------------------------------------------------------------------------------------+)" };
+const std::string VideoDataHolder::s_msg_enterCmd{"MovIO> "};
 
 
 VideoDataHolder::VideoDataHolder(std::ostream& t_out, std::istream& t_in) :
@@ -259,7 +288,7 @@ void VideoDataHolder::executeAction(ActionBindings t_action, const Parameters& t
 void VideoDataHolder::start(){
 	
 	// Print out start screen
-	m_out << s_msg_startScreen << std::endl;;
+	m_out << s_msg_startScreen <<"\n\n"<<std::endl;
 
 	// Main application loop
 	while (true) {
