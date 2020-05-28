@@ -635,15 +635,21 @@ VideosVec& VideoDataHolder::filterVideos(const VideosVec& t_inVideos, VideosVec&
 	auto filterFunction{ [&](const Video& t_video) {
 		
 		// Check name matches
-		if (!t_name.empty() && t_name != t_video.getName()) {return false;}
+		if (!t_name.empty()) {
+			if (t_name != t_video.getName()) { return false; }
+		}
 		
 		// Check id matches
-		if (!t_id.empty() && t_id != t_video.getId()) { return false; }
+		if (!t_id.empty()) {
+			if (t_id != t_video.getId()) { return false; }
+		} 
 
 		// Check genre matches
 		{
 			Genre genre;
-			if (!t_genre.empty() && Video::getGenreFromStr(t_genre, genre) && genre != t_video.getGenre()) { return false; }
+			if (!t_genre.empty()) {
+				if (Video::getGenreFromStr(t_genre, genre) && genre != t_video.getGenre()) { return false; }
+			} 
 		}
 
 		// Check rating matches
