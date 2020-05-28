@@ -193,23 +193,17 @@ private:
 
 template<typename Functor>
 inline VideosVec& VideoDataHolder::filter(Functor t_filter, const VideosVec& t_inVideos, VideosVec& t_outVideos){
-#ifdef _DEBUG
-	int counter{ 0 };
-#endif // _DEBUG
+
 	for (Video* vidPtr : t_inVideos) {
 		if (!vidPtr) {
 			throw std::runtime_error{ "Invalid video pointer.\n" };
 		}
-#ifdef _DEBUG
-		auto val{vidPtr->getDuration()};
-		counter++;
-#endif // _DEBUG
-
 
 		if (t_filter(*vidPtr)) {
 			t_outVideos.push_back(vidPtr);
 		}
 	}
+
 	return t_outVideos;
 }
 

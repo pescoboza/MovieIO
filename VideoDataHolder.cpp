@@ -232,6 +232,9 @@ void VideoDataHolder::parseInfoFromFile(const std::string& t_filename){
 
 std::pair<ActionBindings, bool> VideoDataHolder::structureCommand(const StrVec& t_words, Parameters& t_outParams) {
 	
+	// Check that the words are not empty
+	if (t_words.empty()) { return { ActionBindings{}, false }; }
+
 	// The first word is the action selected
 	auto cmdPair{VideoDataHolder::strToActionBinding(t_words[0])};
 	
@@ -310,7 +313,9 @@ void VideoDataHolder::start(){
 		if (!actionPair.second) {
 			
 			// Print error messsage continue
-			m_out << s_msg_unknownCmdErr << std::endl;
+			if (!words.empty()) {
+				m_out << s_msg_unknownCmdErr << std::endl;
+			}
 			continue;
 		}
 
@@ -652,15 +657,20 @@ VideosVec& VideoDataHolder::filterVideos(const VideosVec& t_inVideos, VideosVec&
 		}
 
 		// Check series matches
-		if (!t_series.empty() && 
-			(t_video.getType() == VideoType::SERIES_EPISODE)) {
+		if (!t_series.empty()) {
 
-			const auto& ep{ dynamic_cast<const Episode&>(t_video) };
-			if (t_series != ep.getSeriesName()) {
-				return false;
+			if (t_video.getType() == VideoType::SERIES_EPISODE) {
+				
+				if (t_series != dynamic_cast<const Episode&>(t_video).getSeriesName()) { 
+					return false;	
+				}
+
 			}
-		}
-
+			else { 
+				return false; 
+			}
+		}	
+		
 		return true;
 	}};
 
