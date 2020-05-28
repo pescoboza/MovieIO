@@ -55,6 +55,11 @@ namespace debug {
 }
 #endif // _DEBUG
 
+
+const VideoDataHolder::ParametersSearch VideoDataHolder::s_params_search{ "name", "id", "genre", "minrating", "maxrating", "minduration", "maxduration", "series" };
+const VideoDataHolder::ParametersSort VideoDataHolder::s_params_sort{ "name", "id", "rating", "duration", { "ascending", "+", "asc", "true", "1" }, { "descending", "-", "des", "false", "0" } };
+const VideoDataHolder::ParametersRate VideoDataHolder::s_params_rate{"id", "rating", "Invalid rating value."};
+
 const std::string VideoDataHolder::s_msg_loading{"Loading data..."};
 const std::string VideoDataHolder::s_msg_notFoundErr{ "ERROR: Could not find a result for the given query." };
 const std::string VideoDataHolder::s_msg_help{ 
@@ -111,7 +116,7 @@ VideoDataHolder::VideoDataHolder(std::ostream& t_out, std::istream& t_in) :
 		{"clear",	ActionBindings::CLEAR},
 		{"c",		ActionBindings::CLEAR},
 		{"help",	ActionBindings::HELP},
-		{"-h",		ActionBindings::HELP},
+		{"h",		ActionBindings::HELP},
 		{"quit",	ActionBindings::QUIT},
 		{"q",		ActionBindings::QUIT}},
 	m_actionBindings{[]() {
@@ -131,30 +136,30 @@ VideoDataHolder::VideoDataHolder(std::ostream& t_out, std::istream& t_in) :
 		CmdParamsMap params;
 
 		// Search
-		params.emplace(m_params_search.m_name,			1U);
-		params.emplace(m_params_search.m_id,			1U);
-		params.emplace(m_params_search.m_genre,			1U);
-		params.emplace(m_params_search.m_minrating,		1U);
-		params.emplace(m_params_search.m_maxrating,		1U);
-		params.emplace(m_params_search.m_minduration,	1U);
-		params.emplace(m_params_search.m_minduration,	1U);
-		params.emplace(m_params_search.m_series,		1U);
+		params.emplace(s_params_search.m_name,			1U);
+		params.emplace(s_params_search.m_id,			1U);
+		params.emplace(s_params_search.m_genre,			1U);
+		params.emplace(s_params_search.m_minrating,		1U);
+		params.emplace(s_params_search.m_maxrating,		1U);
+		params.emplace(s_params_search.m_minduration,	1U);
+		params.emplace(s_params_search.m_minduration,	1U);
+		params.emplace(s_params_search.m_series,		1U);
 
 		cmds.emplace(ActionBindings::SEARCH, std::move(params));
 		params.clear();
 
 		// Sort
-		params.emplace(m_params_sort.m_name,		1U);
-		params.emplace(m_params_sort.m_id,			1U);
-		params.emplace(m_params_sort.m_rating,		1U);
-		params.emplace(m_params_sort.m_duration,	1U);
+		params.emplace(s_params_sort.m_name,		1U);
+		params.emplace(s_params_sort.m_id,			1U);
+		params.emplace(s_params_sort.m_rating,		1U);
+		params.emplace(s_params_sort.m_duration,	1U);
 
 		cmds.emplace(ActionBindings::SORT, std::move(params));
 		params.clear();
 
 		// Rate
-		params.emplace(m_params_rate.m_id, 1U);
-		params.emplace(m_params_rate.m_rating, 1U);
+		params.emplace(s_params_rate.m_id, 1U);
+		params.emplace(s_params_rate.m_rating, 1U);
 		
 		cmds.emplace(ActionBindings::RATE, std::move(params));
 
@@ -250,7 +255,7 @@ std::pair<ActionBindings, bool> VideoDataHolder::structureCommand(const StrVec& 
 			auto &pArgsIt{t_outParams.back().second};
 
 			// For each arg required, advance the word interator and remmeber the word
-			for (unsigned i{ 0U }; i < pIt->second; i++) {
+			for (unsigned i{ 0U }; i < pIt->second && wIt != t_words.cend(); i++) {
 				wIt++;
 				pArgsIt.push_back(&*wIt);
 			}
@@ -416,23 +421,23 @@ void VideoDataHolder::action_search(const Parameters& t_params) {
 		const auto& param{ *kwP.first};
 		const auto& args{ kwP.second };
 
-		if (!alreadyRead[0] && param == m_params_search.m_name) {
+		if (!alreadyRead[0] && param == s_params_search.m_name) {
 			name = args[0]; 
 			alreadyRead[0] = true;
 		}
-		else if (!alreadyRead[1] && param == m_params_search.m_id) {
+		else if (!alreadyRead[1] && param == s_params_search.m_id) {
 			id = args[0]; 
 			alreadyRead[1] = true;
 		}
-		else if (!alreadyRead[2] && param == m_params_search.m_genre) {
-			genre = args[0]; 
+		else if (!alreadyRead[2] && param == s_params_search.m_genre) {
+			genre = args[0];
 			alreadyRead[2] = true;
 		}
-		else if (!alreadyRead[3] && param == m_params_search.m_series) {
+		else if (!alreadyRead[3] && param == s_params_search.m_series) {
 			series = args[0]; 
 			alreadyRead[3] = true;
 		}
-		else if (!alreadyRead[4] && param == m_params_search.m_minrating) {
+		else if (!alreadyRead[4] && param == s_params_search.m_minrating) {
 			try {
 				minr = std::stof(*args[0]);
 			}
@@ -442,7 +447,7 @@ void VideoDataHolder::action_search(const Parameters& t_params) {
 			}
 			alreadyRead[4] = true;
 		}
-		else if (!alreadyRead[5] && param == m_params_search.m_maxrating) {
+		else if (!alreadyRead[5] && param == s_params_search.m_maxrating) {
 			try {
 				maxr = std::stof(*args[0]);
 			}
@@ -452,7 +457,7 @@ void VideoDataHolder::action_search(const Parameters& t_params) {
 			}
 			alreadyRead[5] = true;
 		}
-		else if (!alreadyRead[6] && param == m_params_search.m_minduration) {
+		else if (!alreadyRead[6] && param == s_params_search.m_minduration) {
 			try {
 				mind = std::stoi(*args[0]) * 60; // minutes -> seconds
 			}
@@ -462,7 +467,7 @@ void VideoDataHolder::action_search(const Parameters& t_params) {
 			}
 			alreadyRead[6] = true;
 		}
-		else if (!alreadyRead[7] && param == m_params_search.m_maxduration) {
+		else if (!alreadyRead[7] && param == s_params_search.m_maxduration) {
 			try {
 				maxd = std::stoi(*args[0]) * 60; // minutes -> seconds
 			}
@@ -495,11 +500,11 @@ void VideoDataHolder::action_rate(const Parameters& t_params) {
 		const auto& param{ *kwP.first};
 		const auto& args{ kwP.second };	
 
-		if (!alreadyRead[0] && param == m_params_rate.m_id) {
+		if (!alreadyRead[0] && param == s_params_rate.m_id) {
 			id = args[0];
 			alreadyRead[0] = true;
 		}
-		else if (!alreadyRead[1] && param == m_params_rate.m_rating) {
+		else if (!alreadyRead[1] && param == s_params_rate.m_rating) {
 			try {
 				isRatingValid = true;
 				rating = std::stof(*args[0]);
@@ -519,7 +524,7 @@ void VideoDataHolder::action_rate(const Parameters& t_params) {
 		m_out << s_msg_notFoundErr << std::endl;
 	}
 	else if (!isRatingValid) {
-		m_out << m_params_rate.m_err_rating << std::endl;
+		m_out << s_params_rate.m_err_rating << std::endl;
 	}
 	else {
 		videoIt->second->rate(rating);
@@ -534,22 +539,22 @@ void VideoDataHolder::action_sort(const Parameters& t_params){
 		const auto& param{ *kwP.first };
 		const auto& args{ kwP.second };
 		
-		bool isDescending{ m_params_sort.m_descending.find(*args[0]) != m_params_sort.m_descending.cend()};
+		bool isDescending{ s_params_sort.m_descending.find(*args[0]) != s_params_sort.m_descending.cend()};
 
 
-		if (!alreadyRead[0] && param == m_params_sort.m_name) {
+		if (!alreadyRead[0] && param == s_params_sort.m_name) {
 			sortCriteria.emplace_back(SortCriteria::NAME, isDescending);
 			alreadyRead[0] = true;
 		}
-		else if (!alreadyRead[1] && param == m_params_sort.m_id) {
+		else if (!alreadyRead[1] && param == s_params_sort.m_id) {
 			sortCriteria.emplace_back(SortCriteria::ID, isDescending);
 			alreadyRead[1] = true;
 		}
-		else if (!alreadyRead[2] && param == m_params_sort.m_rating) {
+		else if (!alreadyRead[2] && param == s_params_sort.m_rating) {
 			sortCriteria.emplace_back(SortCriteria::RATING, isDescending);
 			alreadyRead[2] = true;
 		}
-		else if (!alreadyRead[3] && param == m_params_sort.m_duration) {
+		else if (!alreadyRead[3] && param == s_params_sort.m_duration) {
 			sortCriteria.emplace_back(SortCriteria::DURATION, isDescending);
 			alreadyRead[3] = true;
 		}
@@ -647,9 +652,13 @@ VideosVec& VideoDataHolder::filterVideos(const VideosVec& t_inVideos, VideosVec&
 		}
 
 		// Check series matches
-		if (!t_series.empty() && t_video.getType() == VideoType::SERIES_EPISODE && 
-			t_series != dynamic_cast<const Episode*>(&t_video)->getSeason().getSeries().getName()) {
-			return false;
+		if (!t_series.empty() && 
+			(t_video.getType() == VideoType::SERIES_EPISODE)) {
+
+			const auto& ep{ dynamic_cast<const Episode&>(t_video) };
+			if (t_series != ep.getSeriesName()) {
+				return false;
+			}
 		}
 
 		return true;

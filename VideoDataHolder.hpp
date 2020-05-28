@@ -146,33 +146,40 @@ private:
 	std::string input();
 	std::pair<ActionBindings, bool> strToActionBinding(const std::string& t_input) const;
 
-
+public:
+	 
 	struct ParametersSearch {
-		const std::string m_name{ "name" };
-		const std::string m_id{ "id" };
-		const std::string m_genre{ "genre" };
-		const std::string m_minrating{ "minrating" };
-		const std::string m_maxrating{ "maxrating" };
-		const std::string m_minduration{ "minduration" };
-		const std::string m_maxduration{ "maxduration" };
-		const std::string m_series{ "series" };
-	}m_params_search;
+		std::string m_name;
+		std::string m_id;
+		std::string m_genre;
+		std::string m_minrating;
+		std::string m_maxrating;
+		std::string m_minduration;
+		std::string m_maxduration;
+		std::string m_series;
+	};
+	static const ParametersSearch s_params_search;
 
-	struct ParametersSort {
-		const std::string m_name{ "name" };
-		const std::string m_id{ "id" };
-		const std::string m_rating{ "rating" };
-		const std::string m_duration{ "duration" };
-		const std::unordered_set<std::string> m_ascending{ "ascending", "+", "asc", "true", "1" };
-		const std::unordered_set<std::string> m_descending{ "descending", "-", "des", "false", "0" };
-	}m_params_sort;
+	 struct ParametersSort {
+		std::string m_name;
+		std::string m_id;
+		std::string m_rating;
+		std::string m_duration;
+		std::unordered_set<std::string> m_ascending;
+		std::unordered_set<std::string> m_descending;
+	 };
+	 static const ParametersSort s_params_sort;
 
-	struct ParametersRate {
-		const std::string m_id{ "id" };
-		const std::string m_rating{ "rating" };
-		const std::string m_err_rating{ "Invalid rating value." };
-	}m_params_rate;
+	
 
+	 struct ParametersRate {
+		 std::string m_id;
+		 std::string m_rating;
+		 std::string m_err_rating;
+	 };
+	 static const ParametersRate  s_params_rate;
+
+private:
 	static bool isLesser(SortCriteria t_criterion, const Video& t_a, const Video& t_b);
 	static bool isEqual(SortCriteria t_criterion, const Video& t_a, const Video& t_b);
 	
