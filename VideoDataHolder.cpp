@@ -96,7 +96,7 @@ R"(
 |                                                                                                        |
 |                                                                                                        |
 +--------------------------------------------------------------------------------------------------------+)" };
-const std::string VideoDataHolder::s_msg_enterCmd{"MovIO> "};
+const std::string VideoDataHolder::s_msg_enterCmd{"MovIO>"};
 
 
 VideoDataHolder::VideoDataHolder(std::ostream& t_out, std::istream& t_in) :
@@ -491,6 +491,11 @@ void VideoDataHolder::action_search(const Parameters& t_params) {
 	if (maxd > Video::s_maxDuration) { maxd = Video::s_maxDuration; }
 
 	VideoDataHolder::filterVideos((m_buffer.empty() ? m_videosVec : m_buffer), m_buffer,*name, *id, *genre, *series, { minr, maxr }, {mind, maxd});
+	for (const auto& v : m_buffer) {
+		if (v->getDuration() < (mind * 60)){
+			std::cerr << "cholele" << std::endl;
+		}
+	}
 	printVideos(m_buffer, 0U, true, m_out);
 }
 
@@ -654,10 +659,22 @@ VideosVec& VideoDataHolder::filterVideos(const VideosVec& t_inVideos, VideosVec&
 
 		// Check rating matches
 		{
-			const auto& min{t_rating.first};
-			const auto& max{t_rating.second};
+			auto min{t_rating.first};
+			auto max{t_rating.second};
+			if (min > max) { std::swap(min, max); }
 			auto r{t_video.getRating()};
 			if (r < min || r > max) {
+				return false;
+			}
+		}
+
+		// Check duration matches
+		{
+			auto min{t_duration.first * 60};
+			auto max{ t_duration.second * 60};
+			if (min > max) { std::swap(min, max); }
+			auto d{t_video.getDuration()};
+			if (d < min || d > max) {
 				return false;
 			}
 		}
