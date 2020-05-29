@@ -21,46 +21,46 @@ const std::string VideoDataHolder::s_msg_loading{"Loading data..."};
 const std::string VideoDataHolder::s_msg_notFoundErr{ "ERROR: Could not find a result for the given query." };
 const std::string VideoDataHolder::s_msg_help{ 
 R"(+--------------------------------------------------------------------------------------------------------+
-|																										 |
-| Welcome to MovieIO, to use iy type a command:															 |
-|	Command:																							 |
-|	- search : Captures in the buffer the videos matching the query.									 |
-|																										 |
-|		Arguments:																						 |
-|																										 |
-|		- name		  : Name of the video.																 |
-|		- id		  : Unique video ID.																 |
-|		- genre		  : Video genre classification.														 |
-|		- series	  : Series of which the video is an episode (if applicable). 						 |
-|		- minrating	  : Minimum average rating.															 |
-|		- maxrating	  : Maximum average rating.															 |
-|		- minduration : Minimum duration in minutes.													 |
-|		- maxduration : Maximum duration in minutes.													 |
-|																										 |
-|	- sort : Puts the current entries captured in the buffer.											 |
-|																										 |
-|		Arguments:																						 |
-|																										 |
-|		- id		 : Sort by video ID.																 |
-|		- name		 : Sort by video name.																 |
-|		- rating     : Sort by video rating.															 |
-|		- duration   : Sort by video duration.															 |
-|		- +			 : Goes after the arguments above to specify ascending order.						 |
-|		- -			 : Goes after the arguments above to specify descending order.						 |
-|																										 |
-|	- rate : Lets the user enter a new rating for the video selected.									 |
-|																										 |
-|		Arguments:																						 |
-|																										 |
-|		- id		: Specifiy the ID of the video to rate.												 |
-|		- rating    : Quantitative rating value.														 |
-|																										 |
-|   - clear : Clears the screen and the entry buffer, clering the search and sorting.					 |
-|																										 |
-|	- help	: Displays this message.																	 |
-|																										 |
-|	- quit  : Exits MovieIO.																			 |
-|																										 |
+|                                                                                                        |
+| Welcome to MovieIO, to use it type a command:                                                          |
+|    Command:                                                                                            |
+|    - search : Captures in the buffer the videos matching the query.                                    |
+|                                                                                                        |
+|        Arguments:                                                                                      |
+|                                                                                                        |
+|       - name        : Name of the video.                                                               |
+|        - id          : Unique video ID.                                                                |
+|        - genre          : Video genre classification.                                                  |
+|        - series      : Series of which the video is an episode (if applicable).                        |
+|        - minrating      : Minimum average rating.                                                      |
+|        - maxrating      : Maximum average rating.                                                      |
+|        - minduration : Minimum duration in minutes.                                                    |
+|        - maxduration : Maximum duration in minutes.                                                    |
+|                                                                                                        |
+|    - sort : Puts the current entries captured in the buffer.                                           |
+|                                                                                                        |
+|        Arguments:                                                                                      |
+|                                                                                                        |
+|        - id         : Sort by video ID.                                                                |
+|        - name         : Sort by video name.                                                            |
+|        - rating     : Sort by video rating.                                                            |
+|        - duration   : Sort by video duration.                                                          |
+|        - +             : Goes after the arguments above to specify ascending order.                    |
+|        - -             : Goes after the arguments above to specify descending order.                   |
+|                                                                                                        |
+|    - rate : Lets the user enter a new rating for the video selected.                                   |
+|                                                                                                        |
+|        Arguments:                                                                                      |
+|                                                                                                        |
+|        - id        : Specifiy the ID of the video to rate.                                             |
+|        - rating    : Quantitative rating value.                                                        |
+|                                                                                                        |
+|   - clear : Clears the screen and the entry buffer, clering the search and sorting.                    |
+|                                                                                                        |
+|    - help    : Displays this message.                                                                  |
+|                                                                                                        |
+|    - quit  : Exits MovieIO.                                                                            |
+|                                                                                                        |
 +--------------------------------------------------------------------------------------------------------+")"
 };
 const std::string VideoDataHolder::s_msg_unknownCmdErr{ "Please enter a valid command. Use \"help\"." };
@@ -652,8 +652,8 @@ VideosVec& VideoDataHolder::filterVideos(const VideosVec& t_inVideos, VideosVec&
 
 		// Check duration matches
 		{
-			auto min{t_duration.first};
-			auto max{ t_duration.second};
+			auto min{static_cast<unsigned>(t_duration.first)};
+			auto max{ static_cast<unsigned>(t_duration.second)};
 			if (min > max) { std::swap(min, max); }
 			auto d{t_video.getDuration()};
 			if (d < min || d > max) {
@@ -721,12 +721,3 @@ VideosVec& VideoDataHolder::sortVideosBy(const VideosVec& t_inVideos, VideosVec&
 	std::sort(t_outVideos.begin(), t_outVideos.end(), compare);
 	return t_outVideos;
 }
-
-
-Action::Action(ActionBindings t_boundAction, const std::string& t_desc, const std::string& t_usage) : 
-	m_boundAction{ t_boundAction }, m_desc{ t_desc }, m_usage{ t_usage }{}
-
-
-const std::string& Action::getDesc() const { return m_desc; }
-
-const std::string& Action::getUsage() const { return m_usage; }
