@@ -20,7 +20,48 @@ const VideoDataHolder::ParametersRate VideoDataHolder::s_params_rate{"id", "rati
 const std::string VideoDataHolder::s_msg_loading{"Loading data..."};
 const std::string VideoDataHolder::s_msg_notFoundErr{ "ERROR: Could not find a result for the given query." };
 const std::string VideoDataHolder::s_msg_help{ 
-	R"(Help)" 
+R"(+--------------------------------------------------------------------------------------------------------+
+|																										 |
+| Welcome to MovieIO, to use iy type a command:															 |
+|	Command:																							 |
+|	- search : Captures in the buffer the videos matching the query.									 |
+|																										 |
+|		Arguments:																						 |
+|																										 |
+|		- name		  : Name of the video.																 |
+|		- id		  : Unique video ID.																 |
+|		- genre		  : Video genre classification.														 |
+|		- series	  : Series of which the video is an episode (if applicable). 						 |
+|		- minrating	  : Minimum average rating.															 |
+|		- maxrating	  : Maximum average rating.															 |
+|		- minduration : Minimum duration in minutes.													 |
+|		- maxduration : Maximum duration in minutes.													 |
+|																										 |
+|	- sort : Puts the current entries captured in the buffer.											 |
+|																										 |
+|		Arguments:																						 |
+|																										 |
+|		- id		 : Sort by video ID.																 |
+|		- name		 : Sort by video name.																 |
+|		- rating     : Sort by video rating.															 |
+|		- duration   : Sort by video duration.															 |
+|		- +			 : Goes after the arguments above to specify ascending order.						 |
+|		- -			 : Goes after the arguments above to specify descending order.						 |
+|																										 |
+|	- rate : Lets the user enter a new rating for the video selected.									 |
+|																										 |
+|		Arguments:																						 |
+|																										 |
+|		- id		: Specifiy the ID of the video to rate.												 |
+|		- rating    : Quantitative rating value.														 |
+|																										 |
+|   - clear : Clears the screen and the entry buffer, clering the search and sorting.					 |
+|																										 |
+|	- help	: Displays this message.																	 |
+|																										 |
+|	- quit  : Exits MovieIO.																			 |
+|																										 |
++--------------------------------------------------------------------------------------------------------+")"
 };
 const std::string VideoDataHolder::s_msg_unknownCmdErr{ "Please enter a valid command. Use \"help\"." };
 const std::string VideoDataHolder::s_msg_startScreen{ 
@@ -76,17 +117,6 @@ VideoDataHolder::VideoDataHolder(std::ostream& t_out, std::istream& t_in) :
 		{"h",		ActionBindings::HELP},
 		{"quit",	ActionBindings::QUIT},
 		{"q",		ActionBindings::QUIT}},
-	m_actionBindings{[]() {
-		ActionMap bindings;
-		bindings.reserve(static_cast<unsigned>(ActionBindings::QUIT) + 1U);
-		bindings.emplace(ActionBindings::SEARCH,	std::make_unique<Action>(ActionBindings::SEARCH,"descritpion", "search <id> <name> <duration> <>"));
-		bindings.emplace(ActionBindings::RATE,		std::make_unique<Action>(ActionBindings::RATE,	"Add a rating to a video.", "rate <id> <rating>"));
-		bindings.emplace(ActionBindings::SORT,		std::make_unique<Action>(ActionBindings::SORT,	"descritpion", "sort <category>"));
-		bindings.emplace(ActionBindings::CLEAR,		std::make_unique<Action>(ActionBindings::CLEAR,	"descritpion", "usage"));
-		bindings.emplace(ActionBindings::HELP,		std::make_unique<Action>(ActionBindings::HELP,	"description", "usage"));
-		bindings.emplace(ActionBindings::QUIT,		std::make_unique<Action>(ActionBindings::QUIT,	"descritpion", "usage"));
-		return std::move(bindings);
-	}()},
 	m_cmds{ [this]() {
 		CmdsMap cmds;
 

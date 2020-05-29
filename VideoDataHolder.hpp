@@ -52,20 +52,6 @@ enum class ActionBindings {
 	QUIT
 };
 
-class Action {
-
-	ActionBindings m_boundAction;
-	std::string m_desc;
-	std::string m_usage;
-
-public:
-	Action(ActionBindings t_boundAction, const std::string& t_desc, const std::string& t_usage);
-
-	const std::string& getDesc() const;
-	const std::string& getUsage() const;
-	
-};
-
 enum class SortCriteria {
 	NAME,
 	ID,
@@ -84,12 +70,10 @@ class VideoDataHolder {
 	SeriesMap m_series;
 
 	ActionStrMap m_actions;
-	ActionMap m_actionBindings;
 	CmdsMap m_cmds;
 
 	std::ostream& m_out;
 	std::istream& m_in;
-
 	
 	static const std::string s_msg_loading;
 	static const std::string s_msg_startScreen;
