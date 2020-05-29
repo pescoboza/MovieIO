@@ -1,63 +1,20 @@
 #include "VideoDataHolder.hpp"
 #include <algorithm>
 #include <cstdlib>
-#include <stdexcept>
 #include <fstream>
 #include <functional>
 #include <sstream>
+#include <stdexcept>
 #include "json.hpp" // Credits to https://github.com/nlohmann/json
 #include "Utilities.hpp"
 
 namespace js = nlohmann;
-
-
-#ifdef _DEBUG
 #include <unordered_set>
 #include <unordered_map>
 #include <string>
-using EpNumSet = std::unordered_set<unsigned>;
-using SsnNumMap = std::unordered_map<unsigned, EpNumSet>;
-using  SrsMap = std::unordered_map<std::string, SsnNumMap>;
-
-
-namespace debug {
-
-	SrsMap series_seasons_eps;
-
-	bool is_something_repeated(SrsMap& t_map, const std::string& t_seriesName, unsigned t_ssnNum, unsigned t_epNum) {
-		auto series_it{ t_map.find(t_seriesName) };
-		if (series_it == t_map.end()) {
-			t_map.emplace(
-				[&t_seriesName, &t_ssnNum, &t_epNum]() {
-					EpNumSet ep{ t_epNum };
-					SsnNumMap ssn{ {t_ssnNum, std::move(ep)} };
-					return std::make_pair(t_seriesName, ssn);
-				}()
-					);
-			return false;
-		}
-
-		auto& ssnMap{ series_it->second };
-		auto ssn_it{ ssnMap.find(t_ssnNum) };
-		if (ssn_it == ssnMap.end()) {
-			ssnMap.emplace(t_ssnNum, EpNumSet{ t_epNum });
-			return false;
-		}
-
-		auto& epSet{ ssn_it->second };
-		auto ep_it{ epSet.find(t_epNum) };
-		if (ep_it == epSet.end()) {
-			epSet.emplace(t_epNum);
-			return false;
-		}
-		return true;
-	}
-}
-#endif // _DEBUG
-
 
 const VideoDataHolder::ParametersSearch VideoDataHolder::s_params_search{ "name", "id", "genre", "minrating", "maxrating", "minduration", "maxduration", "series" };
-const VideoDataHolder::ParametersSort VideoDataHolder::s_params_sort{ "name", "id", "rating", "duration", { "ascending", "+", "asc", "true", "1" }, { "descending", "-", "des", "false", "0" } };
+const VideoDataHolder::ParametersSort VideoDataHolder::s_params_sort{ "name", "id", "rating", "duration", { "descending", "-", "des", "false", "0" }, { "ascending", "+", "asc", "true", "1" } };
 const VideoDataHolder::ParametersRate VideoDataHolder::s_params_rate{"id", "rating", "Invalid rating value."};
 
 const std::string VideoDataHolder::s_msg_loading{"Loading data..."};
@@ -65,7 +22,7 @@ const std::string VideoDataHolder::s_msg_notFoundErr{ "ERROR: Could not find a r
 const std::string VideoDataHolder::s_msg_help{ 
 	R"(Help)" 
 };
-const std::string VideoDataHolder::s_msg_unknownCmdErr{ "[UNKNOWN COMMAND ERROR]" };
+const std::string VideoDataHolder::s_msg_unknownCmdErr{ "Please enter a valid command. Use \"help\"." };
 const std::string VideoDataHolder::s_msg_startScreen{ 
 R"(
 +--------------------------------------------------------------------------------------------------------+
@@ -142,7 +99,7 @@ VideoDataHolder::VideoDataHolder(std::ostream& t_out, std::istream& t_in) :
 		params.emplace(s_params_search.m_minrating,		1U);
 		params.emplace(s_params_search.m_maxrating,		1U);
 		params.emplace(s_params_search.m_minduration,	1U);
-		params.emplace(s_params_search.m_minduration,	1U);
+		params.emplace(s_params_search.m_maxduration,	1U);
 		params.emplace(s_params_search.m_series,		1U);
 
 		cmds.emplace(ActionBindings::SEARCH, std::move(params));
