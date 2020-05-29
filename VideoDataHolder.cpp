@@ -491,11 +491,6 @@ void VideoDataHolder::action_search(const Parameters& t_params) {
 	if (maxd > Video::s_maxDuration) { maxd = Video::s_maxDuration; }
 
 	VideoDataHolder::filterVideos((m_buffer.empty() ? m_videosVec : m_buffer), m_buffer,*name, *id, *genre, *series, { minr, maxr }, {mind, maxd});
-	for (const auto& v : m_buffer) {
-		if (v->getDuration() < (mind * 60)){
-			std::cerr << "cholele" << std::endl;
-		}
-	}
 	printVideos(m_buffer, 0U, true, m_out);
 }
 
@@ -670,8 +665,8 @@ VideosVec& VideoDataHolder::filterVideos(const VideosVec& t_inVideos, VideosVec&
 
 		// Check duration matches
 		{
-			auto min{t_duration.first * 60};
-			auto max{ t_duration.second * 60};
+			auto min{t_duration.first};
+			auto max{ t_duration.second};
 			if (min > max) { std::swap(min, max); }
 			auto d{t_video.getDuration()};
 			if (d < min || d > max) {
